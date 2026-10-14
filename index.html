@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=1280">
+<title>AAA 冲刺计划 · 交互版（数学竞赛 × CET6）</title>
+<style>
+:root{--blue:#1e50c8;--blue-l:#eef3ff;--blue-b:#bcd0f7;--org:#c2410c;--org-l:#fff4ec;--ink:#0f172a;--mut:#64748b;
+  --line:#e2e8f0;--line2:#cbd5e1;--amber:#b45309;--red:#dc2626;--green:#15803d;
+  --font:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+  color-scheme:light}
+*{box-sizing:border-box}
+body{font-family:var(--font);font-size:13.5px;line-height:1.75;color:var(--ink);margin:0;background:#f4f7fb;overflow:hidden}
+p,li,td,th,span,div,summary{text-wrap:pretty}
+h1,h2,h3,summary,.wt,.wkbar .wb,.sechead{text-wrap:balance}
+
+/* ---------- 全屏三栏（左右固定，仅中栏滚动） ---------- */
+.app{display:grid;grid-template-columns:393px minmax(0,1fr) 353px;gap:15px;
+  max-width:1820px;margin:0 auto;height:100vh;padding:12px 18px;overflow:hidden}
+@media(max-width:1560px){.app{grid-template-columns:310px minmax(0,1fr) 272px}}
+aside{overflow-y:auto;overflow-x:hidden;height:100%;scrollbar-width:thin;scrollbar-color:#c7d2e4 transparent}
+main{overflow-y:auto;height:100%;scrollbar-width:thin;scrollbar-color:#c7d2e4 transparent;padding-right:6px;zoom:1.125}
+main .hd{position:sticky;top:0;z-index:6;background:#f4f7fb;padding:4px 2px 0;margin:0;border-radius:0 0 8px 8px}
+.dateline{font-size:12px;color:#94a3b8;margin-top:1px}
+.hd+.bigcard{margin-top:4px}
+.bigcard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0 0}
+.bigcard>.sechead{margin:0;border-radius:0;box-shadow:none}
+.detailsShell{padding:9px 12px 11px}
+.detailsShell details:first-child{margin-top:0}
+.greet{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.greet h1{font-size:22px;margin:0;letter-spacing:.5px}
+.quote{font-family:"KaiTi","楷体","STKaiti","Kaiti SC","LiSu","隶书",serif;
+  font-size:14.5px;font-weight:600;color:#a16207;letter-spacing:.6px;margin-left:auto;text-align:right}
+@media(max-width:1180px){body{overflow:auto}.app{display:block;height:auto;overflow:visible;padding-bottom:40px}
+  aside,main{overflow:visible;height:auto;padding-right:0}main{zoom:1}main .hd{position:static}}
+
+/* ---------- 面板 & 配色 ---------- */
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:12px}
+.panel.blue{background:linear-gradient(180deg,#f2f7ff,#fff 90px);border-color:var(--blue-b)}
+.panel.org{background:linear-gradient(180deg,#fff8f1,#fff 90px);border-color:#f3c9a8}
+.panel.green{background:linear-gradient(180deg,#f3fbf5,#fff 90px);border-color:#bfe3c8}
+.panel.lilac{background:linear-gradient(180deg,#f8f6ff,#fdfcff 120px);border-color:#e2ddf8}
+.ph{font-weight:700;font-size:13.5px;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+button.mini{font-family:inherit;font-size:11.8px;border:1px solid var(--line2);border-radius:12px;
+  background:#fff;color:#334155;padding:1.5px 11px;cursor:pointer;transition:all .18s}
+button.mini:hover{background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
+label.chk{display:flex;align-items:flex-start;gap:7px;padding:3.5px 0;cursor:pointer;font-size:13px;
+  border-radius:6px;transition:background .2s}
+label.chk:hover{background:#f6f9ff}
+label.chk input{accent-color:var(--blue);width:15px;height:15px;margin:2.5px 0 0;flex:none}
+label.chk span{transition:color .3s}
+label.chk:has(input:checked){color:#94a3b8;text-decoration:line-through}
+.tA{color:var(--blue);font-weight:600}.tE{color:var(--org);font-weight:600}
+.stag{display:inline-block;font-size:10.5px;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+.sim{background:#fee2e2;color:#b91c1c}.lim{background:#fef3c7;color:var(--amber)}
+.gray{color:var(--mut);font-size:12px}
+
+/* ---------- 进度条（惯性动效） ---------- */
+.pbar{height:12px;border-radius:7px;background:#e8eefb;overflow:hidden;margin:8px 0 3px}
+.pbar i{display:block;height:100%;border-radius:7px;width:0;
+  background:linear-gradient(90deg,#3b82f6,#6366f1,#a855f7,#6366f1,#3b82f6);
+  background-size:250% 100%;
+  animation:barflow 2.6s linear infinite;
+  box-shadow:0 0 8px rgba(99,102,241,.4);
+  transition:width .9s cubic-bezier(.22,1.5,.36,1)}
+.pbar.done i{background:linear-gradient(90deg,#34d399,#10b981,#34d399);
+  background-size:250% 100%;
+  box-shadow:0 0 9px rgba(16,185,129,.45)}
+@keyframes barflow{0%{background-position:0% 0}100%{background-position:250% 0}}
+.pbar{position:relative}
+.pbar.pumping{animation:bpump .65s ease}
+.pbar i{position:relative;overflow:hidden}
+.pbar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);transform:translateX(-100%)}
+.pbar.pumping i::after{animation:shine .65s ease}
+@keyframes bpump{0%{transform:scale(1)}35%{transform:scaleY(1.41);box-shadow:0 0 9px rgba(59,130,246,.45)}100%{transform:scaleY(1)}}
+@keyframes shine{to{transform:translateX(100%)}}
+.progline #todayProg{display:inline-block}
+#todayProg.pop{animation:glowPulse .8s ease}
+@keyframes glowPulse{0%{color:#64748b;text-shadow:0 0 0 rgba(59,130,246,0)}
+  30%{color:#1e50c8;text-shadow:0 0 10px rgba(59,130,246,.8),0 0 22px rgba(59,130,246,.4)}
+  100%{color:#64748b;text-shadow:0 0 0 rgba(59,130,246,0)}}
+.progline{display:flex;align-items:center;font-size:12px;color:var(--mut);gap:8px}
+.progline .prog{margin-left:auto}
+.progline .pbar{margin:0;width:auto;flex:1;min-width:140px}
+
+/* ---------- 倒计时（大字凸显） ---------- */
+.cntbox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cnt .cntN{font-size:36px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums}
+.cnt .cntN small{font-size:13px;font-weight:600;color:var(--mut);margin-left:3px}
+.cnt.m .cntN{color:var(--blue)}
+.cnt.e .cntN{color:var(--org)}
+.cnt .cntL{font-size:11.5px;color:var(--mut);margin-top:2px}
+
+/* ---------- 区块色条标题（图文并茂） ---------- */
+.sechead{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:16.5px;
+  padding:5px 14px;border-radius:9px;margin:18px 0 10px;box-shadow:0 2px 6px rgba(15,23,42,.08)}
+.sechead .sub{font-weight:400;font-size:11.8px;opacity:.88}
+.sechead.blue{background:linear-gradient(90deg,#1e50c8,#3b82f6)}
+.sechead.orange{background:linear-gradient(90deg,#d97706,#f59e0b)}
+.sechead.navy{background:linear-gradient(90deg,#1e293b,#334155)}
+
+/* ---------- 左侧：备考时间线（色块分区） ---------- */
+.tlblk{border-radius:10px;padding:8px 10px;margin:8px 0}
+.tlblk .tlbt{font-size:12px;font-weight:700;margin-bottom:4px}
+.tlblk.blue{background:#eef3ff;border:1px solid #d6e2fb}.tlblk.blue .tlbt{color:#1e50c8}
+.tlblk.amber{background:#fff8e8;border:1px solid #f6dfae}.tlblk.amber .tlbt{color:#b45309}
+.tlblk.green{background:#ecfaf1;border:1px solid #c8ecd4}.tlblk.green .tlbt{color:#15803d}
+.tlblk.red{background:#fef1f1;border:1px solid #f7d0d0}.tlblk.red .tlbt{color:#b91c1c}
+.tlblk.outline{background:#fbfcfe;border:1.5px dashed var(--line2)}.tlblk.outline .tlbt{color:#64748b}
+.tlent{padding:5px 7px;border-radius:7px;cursor:pointer;transition:background .15s}
+.tlent:hover{background:rgba(255,255,255,.8)}
+.tlent.tlact{outline:2px solid var(--blue);outline-offset:-1px}
+.tlent .tld{font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums}
+.tlent .tlt{font-size:12.8px;font-weight:700;color:#1e293b;line-height:1.45}
+.tlblk.red .tlent .tlt{color:#b91c1c}
+.jin{background:#ef4444;color:#fff;border-radius:6px;font-size:10px;padding:0 6px;margin-left:6px;vertical-align:1px}
+.legend{font-size:12.2px;color:#334155;line-height:1.8}
+.stline{display:flex;align-items:center;gap:7px;margin:4px 0}
+.sq{width:11px;height:11px;border-radius:3px;flex:none}
+.sq.blue{background:#6b96f0}.sq.green{background:#4cc189}.sq.amber{background:#f0b34c}.sq.red{background:#e86a6a}
+.lchip{display:inline-block;border-radius:5px;padding:0 7px;font-size:11.2px;font-weight:600}
+.lchip.r{background:#fee2e2;color:#b91c1c}.lchip.y{background:#fef3c7;color:var(--amber)}.lchip.g{background:#f1f5f9;color:#64748b}
+
+/* ---------- 右侧：周选择 + 周任务 ---------- */
+.wkbar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+.wkbar .wb{font-family:inherit;border:1px solid var(--line2);background:#fff;border-radius:8px;
+  padding:3px 4px;cursor:pointer;text-align:center;font-size:11.6px;color:#334155;line-height:1.35;transition:all .18s}
+.wkbar .wb small{display:block;font-size:9.2px;color:var(--mut)}
+.wkbar .wb:hover{border-color:var(--blue);background:var(--blue-l)}
+.wkbar .wb.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.wkbar .wb.on small{color:#dbeafe}
+.wkbar .wb.cur{box-shadow:0 0 0 2px var(--blue-b)}
+.wkbar #btnCur{grid-column:1/-1}
+#btnCur:disabled{opacity:.45;cursor:default;background:#f8fafc;border-color:var(--line);color:#94a3b8}
+#weekPanel{border-top:3px solid var(--blue);background:linear-gradient(180deg,#f7faff,#fff 150px)}
+#weekPanel.flash{animation:flashB .9s ease}
+@keyframes flashB{0%{box-shadow:0 0 0 4px rgba(30,80,200,.30)}100%{box-shadow:0 0 0 0 rgba(30,80,200,0)}}
+.weekhead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.weekhead .wid{background:var(--blue);color:#fff;font-weight:700;border-radius:7px;padding:0 9px;font-size:13px}
+.weekhead .wt{font-weight:700;font-size:14.5px}
+.weekhead .wd{color:var(--mut);font-size:12px}
+.wcol{font-size:13px;margin:6px 0}
+.wcol .lab{font-weight:700;font-size:12.4px;margin-bottom:2px}
+.wcol ul{margin:0;padding-left:18px}
+.wcol li{margin:2.5px 0}
+.mile{border-top:1px dashed var(--line2);margin-top:8px;padding-top:7px}
+.wkfix{min-height:340px}
+@keyframes fd{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ---------- 今日任务（含打卡列）/ 课表 ---------- */
+#todayBox{padding:10px 12px 12px;display:flex;flex-direction:column;min-height:372px}
+#todayBox .progline{margin-top:auto}
+#todayBox table{flex:none}
+#ttBox{padding:10px 12px 12px}
+.tt{width:100%;border-collapse:collapse;font-size:12.2px;background:#fff;border-radius:8px;overflow:hidden}
+.tt th,.tt td{border:1px solid var(--line);padding:5px 8px;vertical-align:top;text-align:left}
+.tt th{background:#eef3fb;font-size:11.8px;font-weight:700}
+.tt td.dur{width:64px;text-align:center;color:#334155;font-size:12px;font-weight:700;white-space:nowrap;background:#f6f9ff}
+.tt td.dur .per{display:block;font-size:10.3px;color:var(--mut);font-weight:400;line-height:1.3}
+.tt td.tool{color:#475569;font-size:11.8px;line-height:1.65}
+.tt td.task{line-height:1.65;font-size:13px;font-weight:600;color:#111827}
+.tt td.ck{width:50px;text-align:center}
+.tt td.ck input{accent-color:var(--blue);width:20px;height:20px;cursor:pointer;transition:transform .15s}
+.tt td.ck input:active{transform:scale(.85)}
+.tt td.pri{width:46px;text-align:center}
+.pc{display:inline-block;border-radius:5px;font-size:8.5px;font-weight:700;padding:0 6px;line-height:1.7}
+.pc.p0{background:#fee2e2;color:#b91c1c}
+.pc.p1{background:#fef3c7;color:#b45309}
+.pc.p2{background:#f1f5f9;color:#64748b}
+.tt:not(.wk2) td{padding:4px 8px;line-height:1.4}
+.tt:not(.wk2) td.task,.tt:not(.wk2) td.tool{line-height:1.38}
+.tt .bl{color:#94a3b8;padding-right:3px}
+.tt tr{transition:opacity .25s}
+.tt tr.todayrow{background:#f4f8ff}
+@keyframes rowin{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+.tt tr:has(td.ck input:checked){opacity:.5}
+.tt tr:has(td.ck input:checked) td.task{text-decoration:line-through}
+/* 本周课表：列框为独立覆盖层（连续不断线）—— 今天最强 / 选中弱化 / 悬停轻亮 */
+.ttwrap{position:relative}
+.colframe{position:absolute;pointer-events:none;display:none;border-radius:3px;z-index:3}
+#frameToday{border:2px solid var(--blue);animation:todayPulse 2.6s ease-in-out infinite}
+@keyframes todayPulse{0%,100%{box-shadow:0 0 8px rgba(30,80,200,.18),inset 0 0 10px rgba(30,80,200,.05)}
+  50%{box-shadow:0 0 18px rgba(30,80,200,.42),inset 0 0 16px rgba(30,80,200,.10)}}
+#frameSel{border:1.5px solid #9dbceb;animation:frameIn .3s ease}
+@keyframes frameIn{from{opacity:.35}to{opacity:1}}
+@keyframes rowQuick{from{opacity:0}to{opacity:1}}
+#frameHover{border:1.5px solid #b9cdf0;background:rgba(185,205,240,.15);opacity:0;
+  transition:left .22s ease,top .22s ease,width .22s ease,height .22s ease,opacity .16s ease}
+#frameHover.on{opacity:1}
+.wk2 th.today{background:var(--blue);color:#fff;box-shadow:none}
+.wk2 th.today .badge{display:inline-block;background:#fff;color:var(--blue);border-radius:8px;
+  font-size:10px;padding:0 6px;margin-left:4px;font-weight:700}
+.wk2 td.today{background:#dbeafe}
+.wk2 th.sel{background:#c9d9f5;color:#334155}
+.wk2 th.sel .badge.sb{display:inline-block;background:#8fa9dd;color:#fff;border-radius:8px;
+  font-size:10px;padding:0 6px;margin-left:4px;font-weight:700}
+.wk2 td.sel{background:#e4eeff}
+.wk2{table-layout:fixed}
+.wk2 .tm{font-size:11.4px;font-weight:700;background:#f1f5f9;white-space:nowrap;width:70px;color:#334155}
+.wk2 .tm small{display:block;font-weight:400;color:var(--mut);font-size:10.2px}
+.wk2 td{font-size:11.4px}
+.wk2 .na{color:#cbd5e1;background:#fafbfd}
+.wk2 .e-sim{color:var(--red);font-weight:600}
+.wk2 .e-lim{color:var(--amber);font-weight:600}
+.wk2 .dc{cursor:pointer}
+
+/* ---------- 折叠补充区 ---------- */
+details{background:linear-gradient(180deg,#fbfdff,#fff 60px);border:1px solid var(--line);border-radius:10px;margin:9px 0;padding:9px 13px}
+summary{cursor:pointer;font-weight:700;font-size:13px;color:#1e293b;border-radius:6px;transition:color .18s}
+summary:hover{color:var(--blue)}
+summary::marker{color:var(--blue)}
+.rec{background:#dcfce7;color:var(--green);font-size:10.5px;border-radius:8px;padding:0 7px;margin-left:7px;font-weight:600}
+.dbody{font-size:12.4px;color:#334155;padding-top:6px}
+details[open]>.dbody{animation:fd .28s ease}
+.dbody ul{margin:4px 0;padding-left:19px}
+.dbody table{margin:6px 0}
+table.doc{border-collapse:collapse;width:100%;font-size:12px}
+table.doc th,table.doc td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+table.doc th{background:#f1f5f9}
+/* 优先级铁律：P0/P1/P2 卡片块 */
+.prioHead{display:flex;align-items:center;gap:10px;margin:2px 0 8px;font-size:13.5px}
+.prioHead .most{margin-left:auto;background:#fee2e2;color:#b91c1c;font-size:11px;border-radius:8px;padding:0 8px;font-weight:600}
+.p0,.p1,.p2{border-radius:10px;padding:9px 11px;margin:7px 0}
+.p0{background:#fef4f4;border:1px solid #f8d5d5}
+.p1{background:#fffbf0;border:1px solid #f5e3b9}
+.p2{background:#f8fafc;border:1px solid var(--line2)}
+.p0t{font-weight:700;font-size:12.8px;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:7px}
+.crd{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;transition:box-shadow .2s}
+.crd:hover{box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.crdt{font-weight:700;font-size:12.4px;color:#1e293b}
+.crdd{font-size:11.4px;color:var(--mut)}
+/* 方法与专项卡（框图 + 流程） */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:9px}
+.mcard{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 11px}
+.mcard h5{margin:0 0 6px;font-size:13.4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mcard table.doc{margin:4px 0}
+.mcard table.doc th,.mcard table.doc td{padding:2.5px 7px;font-size:11.6px}
+.flowline{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.fchip{background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-size:11.9px;white-space:nowrap}
+.fchip.hot{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue);font-weight:600}
+.farrow{color:#94a3b8;font-size:11px}
+.mnote{font-size:11.7px;color:var(--mut);margin-top:6px;line-height:1.65}
+.savebox{font-size:11.8px}
+.savebox .stat{color:var(--mut);margin-bottom:6px}
+.cloudbox input{width:100%;font-size:11.5px;padding:3px 8px;border:1px solid var(--line2);border-radius:7px;margin-top:5px;font-family:inherit;color:var(--ink)}
+.cloudbox input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(30,80,200,.12)}
+.cloudbox hr{border:none;border-top:1px dashed var(--line2);margin:9px 0 7px}
+
+/* ---------- 高级交互动效 ---------- */
+.wkbar .wb{position:relative;overflow:hidden;transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+.wkbar .wb:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(30,80,200,.16)}
+.wkbar .wb:active{transform:scale(.95)}
+.wkbar .wb.on{animation:wbpop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes wbpop{0%{transform:scale(.88)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+button.mini{position:relative;overflow:hidden;transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+button.mini:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(30,80,200,.18)}
+button.mini:active{transform:translateY(0) scale(.96)}
+button.mini:disabled{transform:none !important;box-shadow:none !important}
+.ripple{position:absolute;border-radius:50%;background:rgba(99,139,250,.32);transform:scale(0);
+  animation:rip .55s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(2.8);opacity:0}}
+input[type=checkbox]{transition:transform .15s}
+input[type=checkbox]:hover{transform:scale(1.12)}
+input[type=checkbox]:checked{animation:cbpop .34s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cbpop{50%{transform:scale(1.3)}}
+label.chk:has(input:checked){text-decoration:none}
+label.chk span{background-image:linear-gradient(#94a3b8,#94a3b8);background-repeat:no-repeat;
+  background-position:0 60%;background-size:0% 1.5px;
+  transition:background-size .38s ease,color .3s}
+label.chk:has(input:checked) span{background-size:100% 1.5px}
+.tt tr.todayrow td{transition:background .2s}
+.tt tr.todayrow:hover td{background:#eef4ff}
+.tlent{position:relative;overflow:hidden;transition:background .18s,transform .22s cubic-bezier(.34,1.56,.64,1)}
+.tlent:hover{transform:translateX(3px)}
+.tlent::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:2px;
+  background:var(--blue);transform:scaleY(0);transform-origin:center center;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+.tlent.tlact{outline:none;background:#eaf1ff}
+.tlent.tlact::before{transform:scaleY(1)}
+:root{interpolate-size:allow-keywords}
+details::details-content{height:0;overflow:clip;
+  transition:height .35s ease,content-visibility .35s allow-discrete}
+details[open]::details-content{height:auto}
+summary{transition:color .18s,background .18s;border-radius:6px}
+summary:hover{background:#f1f5f9}
+
+/* ---------- 打印版 ---------- */
+.printRoot{display:none}
+@media print{
+  @page{size:A4;margin:12mm 10mm}
+  body{background:#fff;font-size:11.5px;overflow:visible}
+  .app{display:none !important}
+  .printRoot{display:block}
+  .printRoot h1{font-size:20px;margin:0 0 2px}
+  .printRoot h2{font-size:15px;border-bottom:2px solid var(--blue);padding-bottom:3px;margin:18px 0 8px}
+  .printRoot h3{font-size:13px;margin:12px 0 4px;color:var(--blue)}
+  .printRoot table{border-collapse:collapse;width:100%;font-size:10.8px;margin:6px 0}
+  .printRoot th,.printRoot td{border:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
+  .printRoot th{background:#f1f5f9}
+  .printRoot ul{margin:3px 0;padding-left:18px}
+  .printRoot .meta{color:#475569;font-size:11px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- ══════ 左栏：备考时间线（固定） ══════ -->
+  <aside class="side-l">
+    <div class="panel lilac">
+      <div class="ph">备考时间线 <span class="gray" style="font-weight:400;font-size:10.5px">点击节点跳转到对应周任务</span></div>
+      <div id="tlBox"></div>
+    </div>
+    <div class="panel">
+      <div class="ph">分支与阶段</div>
+      <div class="legend">
+        <div class="stline"><span class="sq blue"></span>竞赛线（阶段一 · 10.13–11.13）</div>
+        <div class="stline"><span class="sq green"></span>六级线（阶段三 · 11.15–12.12）</div>
+        <div class="stline"><span class="sq amber"></span>模拟 · 限时（整块专用）</div>
+        <div class="stline"><span class="sq red"></span>考试日（11.14 / 12.12）</div>
+        <div class="stline" style="margin-top:6px">☐ 打卡框勾选后自动保存到输出文件夹</div>
+        <div class="stline">◉ 红色「今」= 当前所处节点</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════ 中栏：今日任务 → 本周课表 → 补充信息 ══════ -->
+  <main class="main">
+    <header class="hd">
+      <div class="greet"><h1 id="greetTxt"></h1><span class="quote" id="quoteTxt"></span></div>
+      <div class="dateline" id="dateLine"></div>
+    </header>
+
+    <section class="bigcard">
+      <div class="sechead blue">📋 <span id="todayHeadTxt">今日任务</span> <span class="sub" id="todayTitle"></span></div>
+      <div id="todayBox"></div>
+    </section>
+
+    <section class="bigcard">
+      <div class="sechead orange">🗓 本周课表 <span class="sub" id="ttTitle"></span></div>
+      <div id="ttBox"></div>
+    </section>
+
+    <section class="bigcard">
+    <div class="sechead navy" id="extraH">📎 补充信息 <span class="sub">按重要性排序 · 点击标题展开</span></div>
+    <div class="detailsShell">
+    <details id="d1"><summary>① 九周总览表</summary><div class="dbody" id="overviewBox"></div></details>
+    <details id="d2"><summary>② 方法与专项卡（单词 / 听力 / 阅读 / 写译 / 数学计算）</summary><div class="dbody" id="methodBox"></div></details>
+    <details id="d3"><summary>③ 考试日执行卡（11.14 竞赛 · 12.12 六级）</summary><div class="dbody" id="examBox"></div></details>
+    <details id="d4"><summary>④ 优先级铁律 & 弹性调整</summary><div class="dbody" id="riskBox"></div></details>
+    <details id="d5"><summary>⑤ 资料清单</summary><div class="dbody" id="matBox"></div></details>
+    <details id="d6"><summary>⑥ 情报来源</summary><div class="dbody" id="srcBox"></div></details>
+    </div>
+    </section>
+  </main>
+
+  <!-- ══════ 右栏：倒计时 → 本周任务 → 存档（固定） ══════ -->
+  <aside class="side-r">
+    <div class="panel org">
+      <div class="ph">⏳ 倒计时</div>
+      <div id="countBox" class="gray" style="font-variant-numeric:tabular-nums"></div>
+    </div>
+
+    <div class="panel blue" id="weekPanel">
+      <div class="ph">📅 本周任务</div>
+      <div class="wkbar" id="wkbar"></div>
+      <section id="weekBox"></section>
+    </div>
+
+    <div class="panel savebox">
+      <div class="ph">💾 存档</div>
+      <div class="stat" id="saveStatus"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="mini" id="btnBind" onclick="pickFolder()">绑定存档文件夹</button>
+        <button class="mini" id="btnSync" style="display:none" onclick="syncNow()">点击授权并同步</button>
+        <button class="mini" onclick="exportBackup()">导出备份</button>
+        <button class="mini" onclick="$('impFile').click()">从文件恢复</button>
+        <input type="file" id="impFile" accept=".json,application/json" style="display:none">
+      </div>
+      <div class="cloudbox">
+        <hr>
+        <div class="ph" style="font-size:12.5px;margin-bottom:2px">☁ 云端同步（多设备）</div>
+        <input id="cUrl" placeholder="云接口地址，如 https://api.jsonbin.io/v3/b/xxxxxx">
+        <input id="cKey" placeholder="密钥（jsonbin 填 X-Master-Key）">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <button class="mini" onclick="cloudSaveCfg()">保存并同步</button>
+          <button class="mini" onclick="cloudSyncNow()">☁ 立即同步</button>
+        </div>
+        <div class="stat" id="cloudStat" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="printRoot" id="printRoot"></div>
+<noscript><p style="padding:20px">此页面需要启用 JavaScript 以显示交互功能。</p></noscript>
+
+<script>
+/* ═══════════ 数据 ═══════════ */
+var TMPL={
+ "一":{
+  morning:{t:"墨墨背单词：40 新词 + 复习",dur:"15′",
+    tool:["工具：墨墨背单词 · CET6 核心词库","只认义、不拼写；复习队列 >100 词 → 只复习不加新词"]},
+  noon:{t:"六级真题听力精听 1 篇",dur:"15′",
+    tool:["五步法：①盲听抓主旨 ②逐句听写 ③对照纠错","④跟读模仿语音 ⑤归纳 1 行出题套路"]},
+  read:{t:"真题仔细阅读 1 篇",dur:"12′",
+    tool:["三步法：题干定位 → 句间逻辑 → 选项比对","复盘 5′：标定位句 / 抄替换词 / 贴错因"]},
+  nb:{t:"「不背单词」App：看 10–15 个例句",dur:"≤10′",
+    tool:["看例句记语境、不背拼写","走路 / 排队 / 饭前进行"]},
+  ft:{t:"泛听真题音频",dur:"≤10′",
+    tool:["每日英语听力 App · 真题音频","不求全懂，只求耳熟"]},
+  sleep:{t:"错题回顾 + 墨墨扫尾",dur:"10′",
+    tool:["数学错题 1 道 + 英语要点 1 个","写 1 行明日任务卡"]}
+ },
+ "三":{
+  morning:{t:"墨墨：40 新词 + 复习",dur:"15–20′",
+    tool:["复习 >100 词 → 新词降为 25","12.8 起停止新词，只滚复习"]},
+  noon:{t:"精听 1 篇 + 泛听 5′",dur:"25–30′",
+    tool:["分层笔记：观点 → 例子 → 结论；抓定义句"]},
+  frag:{t:"熟词僻义清单扫读",dur:"10′",
+    tool:["例：fine=罚款 / check=寄存 / last=最不愿意的","「不背单词」App 同步看例句"]},
+  sleep:{t:"复盘 3 行 + 墨墨扫尾",dur:"10′",
+    tool:["写明日任务卡；确认明日课表时间"]}
+ }
+};
+/* 听力材料轮换：Section B（听力篇章）↔ Section C（讲座），每套真题先 B 后 C */
+var SETS=["2023年6月","2023年12月","2024年6月","2024年12月","2025年6月","2025年12月"];
+var TOOLK={
+ m:["《解析教程》对应章：要点 15′","限时练习 40′（真题 + 拓展题）","归因：错题贴标签 + 计算专项 3–5 题（10′）"],
+ limit:["闭卷限时 30′：6–8 道中档题","选题：真题填空 + 教材能力拓展题","达标：≥85% 且 0 低级失误"],
+ sim:["按考场时间整卷 150′（9:00–11:30）","下午逐题归因：会 / 算错 / 不会 三类分开"],
+ exam:["带齐证件文具，按「考试日执行卡」节奏作答"],
+ rest:["只做复盘 1 页，允许放松"],
+ e:["真题轮换 · 模块限时 + 复盘"],
+ "e-sim":["按考场节奏限时执行 + 归因表"],
+ diag:["限时作答 + 立即对答案","错题贴错因标签：概念 / 计算 / 审题 / 时间"],
+ wrap:["错题本重做本周错题","统计错因占比，确认下周计划"],
+ refresh:["错题本滚动重做 + 归因统计"],
+ warm:["已精听材料跟读 + 作文框架默写"],
+ write:["限时 30′ 写完 / 译完 + 对照参考自评"]
+};
+var WEEKS=[
+{id:1,mon:"2026-10-12",from:1,to:6,ph:"一",title:"诊断周",
+ math:["16届真题分块限时（10.13–15）→ 定出最弱 3 个专题","专题① 极限与连续 起步"],
+ eng:["墨墨 40 词/日 起步","精听与阅读 隔日轮换"],
+ miles:["最弱 3 专题已定","精听 ≥3 篇","单词打卡 6 天","报名缴费确认"],
+ eve:[null,
+  {t:"诊断：填空 5 题（45′）",k:"diag"},
+  {t:"诊断：大题 16–18（70′）",k:"diag"},
+  {t:"诊断：大题 19–21 + 评分 → 定最弱 3 专题",k:"diag"},
+  {t:"专题① 极限与连续",k:"m"},
+  {t:"专题① 极限与连续",k:"m"},
+  {t:"专题① 收尾 + 周结算 15′",k:"wrap"}]},
+{id:2,mon:"2026-10-19",from:0,to:6,ph:"一",title:"专题②③",
+ math:["专题② 一元微分（中值定理证明）","专题③ 一元积分（广义积分）"],
+ eng:["精听 ≈4 篇 / 阅读 ≈3 篇（隔日）","碎片：不背例句或泛听"],
+ miles:["专题②③ 各 20 题","中档限时#1 正确率≥80%","精听累计 8 篇","同义替换本 3 页"],
+ eve:[{t:"专题② 一元微分",k:"m"},{t:"专题② 一元微分",k:"m"},{t:"专题② 收尾",k:"m"},
+  {t:"专题③ 一元积分",k:"m"},{t:"专题③ 一元积分",k:"m"},
+  {t:"中档限时#1（30′）+ ③收尾",k:"limit"},{t:"错题重做 + 周结算",k:"wrap"}]},
+{id:3,mon:"2026-10-26",from:0,to:6,ph:"一",title:"专题④⑤",
+ math:["专题④ 多元微分（含梯度 ⭐）","专题⑤ 重积分/空间几何（曲面面积 ⭐）"],
+ eng:["精听 ≈4 篇（含讲座）/ 阅读 ≈3 篇","长篇匹配 1 篇"],
+ miles:["专题④⑤ 完成","中档限时#2：7/8 题","精听累计 14 篇","匹配 1 篇 + 复盘"],
+ eve:[{t:"专题④ 多元微分",k:"m"},{t:"专题④ 多元微分",k:"m"},{t:"专题④ 收尾",k:"m"},
+  {t:"专题⑤ 重积分/空间几何",k:"m"},{t:"专题⑤ 重积分/空间几何",k:"m"},
+  {t:"中档限时#2 + ⑤收尾",k:"limit"},{t:"错题重做 + 周结算",k:"wrap"}]},
+{id:4,mon:"2026-11-02",from:0,to:6,ph:"一",title:"专题⑥ + 模拟#1",
+ math:["专题⑥ 微分方程（含伯努利 ⭐）","错题本第 1 轮滚动"],
+ eng:["精听 5 篇保底","仔细阅读 3 篇","选词填空体验 1 次（5′止损）"],
+ miles:["专题⑥ 完成","模拟#1 ≥65 分","错题本 1 轮","整卷节奏跑通"],
+ eve:[{t:"专题⑥ 微分方程",k:"m"},{t:"专题⑥ 微分方程",k:"m"},{t:"专题⑥ 微分方程",k:"m"},
+  {t:"专题⑥ 收尾",k:"m"},{t:"错题本第 1 轮滚动",k:"refresh"},
+  {t:"错题滚动 + 级数速览（可跳过）",k:"refresh"},
+  {t:"🎯 全真模拟#1：9:00–11:30 ＋ 下午复盘",k:"sim"}]},
+{id:5,mon:"2026-11-09",from:0,to:6,ph:"一",title:"冲刺周",
+ math:["模拟#1 复盘 → 只补丢分 TOP2","压轴「步骤分」训练 ×3","全真模拟#2","公式默写 + 易错清单"],
+ eng:["单词 20′/日（复习优先）","精听 3 篇（保温）"],
+ miles:["模拟#2 ≥70 分","两套复盘完成","公式默写 0 失误","物品清单核对"],
+ eve:[{t:"模拟#1 深度复盘（只补 TOP2）",k:"wrap"},
+  {t:"压轴「步骤分」×3 道",k:"m",tool:["只写前两问 / 关键步骤，不追完全解"]},
+  {t:"🎯 全真模拟#2（或拆两晚 90′+60′）",k:"sim",tool:["首选整卷；有课则拆两晚，各 ≤120′"]},
+  {t:"复盘#2 + 错题本终滚",k:"wrap"},
+  {t:"公式默写 + 22:30 早睡",k:"m",tool:["默写全对为止；核对考试物品清单"]},
+  {t:"🏆 竞赛初赛 9:00–11:30",k:"exam"},
+  {t:"休整 + 竞赛复盘 1 页",k:"rest"}]},
+{id:6,mon:"2026-11-16",from:0,to:6,ph:"三",title:"讲座专项 + 模考#1",
+ math:[],eng:["讲座分层笔记 ≥4 篇","阅读三步法强化（一三五）","熟词僻义清单启动"],
+ miles:["模考#1：听 ≥140 读 ≥150","讲座笔记 4 篇","错因分类表建立","单词过半（≈1200）"],
+ eve:[{t:"阅读 2 篇 + 复盘",k:"e",tool:["真题仔细阅读 2 篇限时 25′","复盘 35′：替换词本 + 干扰项错因"]},
+  {t:"听力强化：讲座 2 篇分层笔记",k:"e",tool:["观点 → 例子 → 结论 三层记录","摘录信号词句（but/however/therefore）"]},
+  {t:"阅读 2 篇 + 复盘",k:"e",tool:["真题仔细阅读 2 篇限时 25′","复盘 35′：替换词本 + 干扰项错因"]},
+  {t:"听力强化：讲座 2 篇",k:"e",tool:["分层笔记 + 摘录信号词句"]},{t:"阅读 2 篇 + 复盘",k:"e"},
+  {t:"🎯 拆分模考#1：听力+阅读（70′）+ 复盘",k:"e-sim",tool:["按考场节奏：听力 30′ → 阅读 40′","复盘 40′：错因四分类"]},
+  {t:"🎯 模考#1：写作+翻译（60′）+ 自评",k:"e-sim",tool:["写作 30′ + 翻译 30′ 限时","对照范文自评 40′"]}]},
+{id:7,mon:"2026-11-23",from:0,to:6,ph:"三",title:"弱项二轮 + 模考#2",
+ math:[],eng:["错因 TOP1 加练 1 组/日","单词高频复习期","写译各 1 次"],
+ miles:["模考#2：听 ≥150 读 ≥160","仔细阅读 ≥60%","僻义清单 ≥30 条"],
+ eve:[{t:"阅读 2 篇 + 复盘",k:"e"},{t:"听力强化 + 错因 TOP1 加练",k:"e"},
+  {t:"阅读 2 篇 + 复盘",k:"e"},{t:"听力强化 + TOP1 加练",k:"e"},{t:"阅读 2 篇 + 复盘",k:"e"},
+  {t:"🎯 拆分模考#2：听力+阅读 + 复盘",k:"e-sim"},{t:"🎯 模考#2：写译 + 自评",k:"e-sim"}]},
+{id:8,mon:"2026-11-30",from:0,to:6,ph:"三",title:"框架定稿 + 模考#3",
+ math:[],eng:["作文 3 套框架定稿（可默写）","翻译文化类专练 ×2","12.1 打印准考证"],
+ miles:["模考#3：估分 ≥440","3 框架可默写","表达库 ≥40 条","准考证已打印"],
+ eve:[{t:"阅读 2 篇 + 复盘",k:"e"},{t:"听力强化",k:"e"},{t:"阅读 2 篇 + 复盘",k:"e"},
+  {t:"写译专项：限时写 1 篇",k:"write"},{t:"阅读 2 篇 + 框架默写",k:"e"},
+  {t:"🎯 拆分模考#3：听力+阅读 + 复盘",k:"e-sim"},{t:"🎯 模考#3：写译 + 自评",k:"e-sim"}]},
+{id:9,mon:"2026-12-07",from:0,to:5,ph:"三",title:"保温周（不刷新题）",
+ math:[],eng:["错题 / 僻义终滚","已精听材料跟读","框架默写 ×1/日"],
+ miles:["不刷新题（纪律）","框架默写 1 遍","耳机调频试音","路线 + 物品确认"],
+ eve:[{t:"错题 + 僻义终滚",k:"e"},{t:"错题 + 僻义终滚",k:"e"},{t:"跟读保温 + 框架默写",k:"warm"},
+  {t:"跟读保温 + 框架默写",k:"warm"},{t:"物品清单 + 耳机试音 + 21:30 睡",k:"e"},
+  {t:"🎯 CET6 15:00–17:25",k:"exam"},null]}
+];
+/* 备考时间线（色块分区） */
+var TL=[
+ {color:"blue",title:"竞赛线 · 阶段一",items:[
+   {d:"2026-10-13",t:"启动日",w:1},
+   {d:"2026-10-15",t:"真题诊断完成 → 薄弱清单",w:1},
+   {d:"2026-10-16",e:"2026-11-08",t:"专题突破期（7 大专题）",w:1}]},
+ {color:"amber",title:"模拟 · 限时",items:[
+   {d:"2026-10-24",t:"中档限时①",w:2},
+   {d:"2026-10-31",t:"中档限时②",w:3},
+   {d:"2026-11-08",t:"竞赛模拟①（全真 150′）",w:4},
+   {d:"2026-11-11",t:"竞赛模拟②（或拆两晚）",w:5}]},
+ {color:"red",title:"考试日",items:[
+   {d:"2026-11-14",t:"🏆 数学竞赛初赛 9:00–11:30",w:5}]},
+ {color:"green",title:"六级线 · 阶段三",items:[
+   {d:"2026-11-15",t:"过渡休整 → 六级启动",w:5},
+   {d:"2026-11-21",e:"2026-11-22",t:"六级模考①（拆分）",w:6},
+   {d:"2026-11-28",e:"2026-11-29",t:"六级模考②（拆分）",w:7},
+   {d:"2026-12-01",t:"打印准考证",w:8},
+   {d:"2026-12-05",e:"2026-12-06",t:"六级模考③（拆分）",w:8},
+   {d:"2026-12-07",e:"2026-12-11",t:"保温周（不刷新题）",w:9}]},
+ {color:"red",title:"考试日",items:[
+   {d:"2026-12-12",t:"🎯 CET6 15:00–17:25",w:9}]},
+ {color:"outline",title:"分支",items:[
+   {d:"2027-04-01",t:"若入围 → 决赛（大连理工 · 高数+线代）",w:9,extra:true,lab:"2027.4"}]}
+];
+var WD=["周一","周二","周三","周四","周五","周六","周日"];
+var EXAM_M="2026-11-14",EXAM_E="2026-12-12";
+/* 每日问候 + 励志话语（按日期轮换，全部正能量） */
+var NICK="魏于飞";
+var QUOTES=[
+"浅水是喧哗的，深水是沉默的",
+"自我控制是最强者的本能",
+"若能脱颖而出，何必苦苦融入",
+"星光不问赶路人，时光不负有心人",
+"不怕慢，只怕站——每天两小时，省一在望",
+"把简单的事做到极致，就是不简单",
+"今天多算对一道题，考场上就多一分从容",
+"积跬步以至千里，积小流以成江海",
+"心有静气，手有准头",
+"重复到极致，就是天赋",
+"所有的幸运，都是努力埋下的伏笔",
+"与其临渊羡鱼，不如退而结网",
+"每天进步一点点，六十天后是全新的自己",
+"沉住气，慢慢来，比较快",
+"你付出的每一分钟，都在为将来的自己铺路",
+"山再高，往上攀，总能登顶",
+"专注当下这一题，世界就安静了",
+"功夫到了，分数自然到",
+"自强不息，厚德载物",
+"一件事做到极致，胜过平庸地做一万件",
+"路虽远，行则将至；事虽难，做则必成",
+"悄悄努力，然后惊艳所有人",
+"心之所向，素履以往",
+"时间会奖励每一个认真的人",
+"今天再晚也是早，明天再早也是晚",
+"破釜沉舟，百二秦关终属楚",
+"以平常心，做非常事",
+"每一个清晨，都是新的出发",
+"坚持本身就是一种才华",
+"把每一天过成限量版",
+"眼中有光，脚下有路",
+"认真的人改变自己，坚持的人改变命运",
+"腹有诗书气自华",
+"少年易老学难成，一寸光阴不可轻",
+"长风破浪会有时，直挂云帆济沧海",
+"你只管努力，剩下的交给时间"];
+function renderGreet(){
+  var hh=new Date().getHours(),g;
+  if(hh>=5&&hh<11)g="早上好";else if(hh>=11&&hh<13)g="中午好";
+  else if(hh>=13&&hh<18)g="下午好";else if(hh>=18&&hh<23)g="晚上好";
+  else g="夜深了";
+  var day=Math.floor((today()-D("2026-01-01"))/86400000);
+  var q=QUOTES[((day%QUOTES.length)+QUOTES.length)%QUOTES.length];
+  var gt=$("greetTxt"),qt=$("quoteTxt");
+  if(gt)gt.textContent=g+"，"+NICK;
+  if(qt)qt.textContent=q;
+  var dl=$("dateLine");
+  if(dl){
+    var n=today(),dayN=Math.floor((n-D(PLAN_START))/86400000)+1;
+    var dstr=n.getFullYear()+"年"+md(n)+" "+WD[wdIdx(n)];
+    if(dayN<1)dl.textContent=dstr+" · 计划 10.13 启动（还有 "+(-dayN+1)+" 天）";
+    else if(dayN>61)dl.textContent=dstr+" · 计划已完成 🎉";
+    else dl.textContent=dstr+" · 计划第 "+dayN+" 天（共 61 天）";
+  }
+}
+
+/* ═══════════ 工具函数 ═══════════ */
+function D(iso){var a=iso.split("-");return new Date(+a[0],+a[1]-1,+a[2]);}
+function addD(dt,n){var x=new Date(dt);x.setDate(x.getDate()+n);return x;}
+function iso(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");}
+function md(dt){return (dt.getMonth()+1)+"月"+dt.getDate()+"日";}
+function wdIdx(dt){return (dt.getDay()+6)%7;}
+function today(){return window.__TODAY_OVERRIDE__?D(window.__TODAY_OVERRIDE__):new Date();}
+function weekEnd(w){return iso(addD(D(w.mon),6));}
+function findWeek(tISO){for(var i=0;i<WEEKS.length;i++){if(tISO>=iso(addD(D(WEEKS[i].mon),WEEKS[i].from))&&tISO<=weekEnd(WEEKS[i]))return WEEKS[i];}return null;}
+function toolOf(ev,ph){if(!ev)return[];if(ev.tool)return ev.tool;if(TOOLK[ev.k])return TOOLK[ev.k];return ph==="一"?TOOLK.m:TOOLK.e;}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function bl(arr){if(!arr||!arr.length)return "";var h=esc(arr[0]);
+  for(var i=1;i<arr.length;i++)h+='<br><span class="bl">·</span>'+esc(arr[i]);return h;}
+function blp(arr){if(!arr||!arr.length)return "";var h=esc(arr[0]);
+  for(var i=1;i<arr.length;i++)h+="<br>"+esc(arr[i]);return h;}
+function daysTo(isoS){return Math.round((D(isoS)-D(TISO))/86400000);}
+/* —— 听力/阅读 隔日轮换（阶段一）；听力按 B→C 交替 —— */
+function isListenDay(dateISO){
+  var w=findWeek(dateISO),ph=w?w.ph:"一";
+  if(ph==="三")return true;
+  return (Math.floor((D(dateISO)-D(PLAN_START))/86400000)%2)===1;
+}
+function listenMat(dateISO){
+  var k=-1,n=Math.floor((D(dateISO)-D(PLAN_START))/86400000);
+  for(var i=0;i<=n;i++){
+    var dt=addD(D(PLAN_START),i),w=findWeek(iso(dt)),ph=w?w.ph:"一";
+    if(ph==="三"||i%2===1)k++;
+  }
+  var idx=((k%12)+12)%12;
+  return SETS[Math.floor(idx/2)]+" · Section "+(idx%2===0?"B（听力篇章）":"C（讲座）");
+}
+function card(t,d){return '<div class="crd"><div class="crdt">'+t+'</div><div class="crdd">'+d+'</div></div>';}
+
+/* ═══════════ 打卡状态 ═══════════ */
+var S={};
+var dirHandle=null,fileStatus="local",lastSave="";
+function filterItems(o){var r={};Object.keys(o).forEach(function(k){if(k.charAt(0)!=="_")r[k]=o[k];});return r;}
+function saveLocal(){try{localStorage.setItem("aaa3:data",JSON.stringify({updated:S._updated||0,items:filterItems(S)}));}catch(e){}}
+function loadLocal(){
+  var raw=null;try{raw=localStorage.getItem("aaa3:data");}catch(e){}
+  if(raw){try{var o=JSON.parse(raw);S=o.items||{};S._updated=o.updated||0;return;}catch(e){}}
+  S={};
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);
+    if(k&&k.indexOf("aaa3:")===0&&k!=="aaa3:data"&&localStorage.getItem(k)==="1")S[k.slice(5)]=1;}}catch(e){}
+  S._updated=0;
+}
+function chk(k,label){return '<label class="chk"><input type="checkbox" data-k="'+k+'"'+(S[k]?" checked":"")+'><span>'+label+'</span></label>';}
+function applyState(){
+  document.querySelectorAll("input[data-k]").forEach(function(i){i.checked=!!S[i.dataset.k];});
+  updCounts();
+}
+/* —— 文件夹存档 —— */
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open("aaa-store",1);
+  r.onupgradeneeded=function(){r.result.createObjectStore("kv");};
+  r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});}
+function idbGet(k){return idb().then(function(db){return new Promise(function(res){
+  var t=db.transaction("kv","readonly").objectStore("kv").get(k);
+  t.onsuccess=function(){res(t.result);};t.onerror=function(){res(null);};});});}
+function idbSet(k,v){return idb().then(function(db){return new Promise(function(res){
+  var t=db.transaction("kv","readwrite").objectStore("kv").put(v,k);
+  t.onsuccess=function(){res(1);};t.onerror=function(){res(0);};});});}
+var SAVE_FILE="AAA打卡存档.json";
+function pickFolder(){
+  if(!window.showDirectoryPicker)return;
+  window.showDirectoryPicker({id:"aaa-save",mode:"readwrite"}).then(function(h){
+    dirHandle=h;idbSet("dir",h);return syncNow();
+  }).catch(function(){});
+}
+function syncNow(){
+  if(!dirHandle)return Promise.resolve(false);
+  return dirHandle.requestPermission({mode:"readwrite"}).then(function(p){
+    if(p!=="granted"){fileStatus="needperm";updSaveUI();return false;}
+    return readFileAndMerge(true).then(function(){return doWrite();});
+  }).catch(function(){fileStatus="err";updSaveUI();return false;});
+}
+function readFileAndMerge(fromClick){
+  if(!dirHandle)return Promise.resolve(false);
+  return dirHandle.getFileHandle(SAVE_FILE).then(function(fh){return fh.getFile();}).then(function(f){return f.text();})
+  .then(function(txt){
+    var obj=null;try{obj=JSON.parse(txt);}catch(e){}
+    if(obj&&(obj.items||obj.updated)){
+      var m=mergeRecords({updated:S._updated||0,items:filterItems(S)},{updated:obj.updated||0,items:filterItems(obj.items||{})});
+      S=m.items;S._updated=m.updated;saveLocal();applyState();
+    }
+    fileStatus="bound";updSaveUI();return true;
+  }).catch(function(){if(fromClick){fileStatus="bound";updSaveUI();}return false;});
+}
+function doWrite(){
+  if(!dirHandle)return Promise.resolve(false);
+  return dirHandle.getFileHandle(SAVE_FILE,{create:true}).then(function(fh){return fh.createWritable();})
+  .then(function(w){return w.write(JSON.stringify({updated:S._updated||Date.now(),items:filterItems(S)})).then(function(){return w.close();});})
+  .then(function(){fileStatus="bound";lastSave=new Date().toTimeString().slice(0,8);updSaveUI();return true;})
+  .catch(function(){fileStatus="err";updSaveUI();return false;});
+}
+var saveTimer=null;
+function autosave(){
+  if(!dirHandle)return;
+  dirHandle.queryPermission({mode:"readwrite"}).then(function(p){
+    if(p!=="granted"){fileStatus="needperm";updSaveUI();return;}
+    doWrite();
+  }).catch(function(){});
+}
+function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(autosave,700);}
+function updSaveUI(){
+  var el=$("saveStatus");if(!el)return;
+  var canFS=!!window.showDirectoryPicker;
+  var t="",bind=$("btnBind"),sync=$("btnSync");
+  if(!canFS){t="当前浏览器不支持文件夹存档，进度保存在浏览器本地。";bind.style.display="none";sync.style.display="none";}
+  else{
+    bind.style.display=(fileStatus==="bound")?"none":"";
+    bind.textContent=(fileStatus==="needperm"||fileStatus==="err")?"更换存档文件夹":"绑定存档文件夹";
+    if(fileStatus==="bound"){t="✓ 已绑定输出文件夹 · 自动保存"+(lastSave?"（最近 "+lastSave+"）":"");sync.style.display="none";}
+    else if(fileStatus==="needperm"){t="浏览器需要一次点击授权，才能读写存档文件。";bind.style.display="none";sync.style.display="";}
+    else if(fileStatus==="err"){t="文件夹写入失败，进度已存浏览器本地；可更换文件夹重试。";sync.style.display="none";}
+    else{t="进度暂存在浏览器本地。建议绑定「cc输出」文件夹，清理浏览器数据也不丢。";sync.style.display="none";}
+  }
+  el.textContent=t;
+}
+function exportBackup(){
+  var blob=new Blob([JSON.stringify({updated:S._updated||Date.now(),items:filterItems(S)},null,1)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=SAVE_FILE;a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+}
+$("impFile").addEventListener("change",function(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){try{var obj=JSON.parse(r.result);
+    if(obj&&obj.items){var m=mergeRecords({updated:S._updated||0,items:filterItems(S)},{updated:obj.updated||0,items:filterItems(obj.items)});S=m.items;S._updated=m.updated;saveLocal();applyState();debounceSave();debounceCloud();}
+  }catch(err){}};
+  r.readAsText(f);e.target.value="";
+});
+/* ═══════════ 云同步（多设备） ═══════════ */
+function mergeRecords(a,b){/* 逐键按时间戳取新（值为 0 表示"取消勾选"的墓碑，同样参与比较） */
+  a=a||{};b=b||{};var ai=a.items||{},bi=b.items||{},it={},keys={};
+  Object.keys(ai).forEach(function(k){keys[k]=1;});
+  Object.keys(bi).forEach(function(k){keys[k]=1;});
+  Object.keys(keys).forEach(function(k){
+    var va=ai[k]||0,vb=bi[k]||0;
+    it[k]=((vb*1)>=(va*1))?vb:va;
+  });
+  return {updated:Math.max(a.updated||0,b.updated||0),items:it};
+}
+var CLOUD={url:"",key:""};
+try{var _cj=localStorage.getItem("aaa3:cloud");if(_cj){var _co=JSON.parse(_cj);CLOUD.url=_co.url||"";CLOUD.key=_co.key||"";}}catch(e){}
+function cloudConfigured(){return !!CLOUD.url;}
+function isJsonBin(){return CLOUD.url.indexOf("jsonbin")>=0;}
+function updCloudUI(msg){
+  var el=$("cloudStat");if(!el)return;
+  if(msg){el.textContent=msg;return;}
+  el.textContent=cloudConfigured()?"☁ 云端已配置："+CLOUD.url.replace(/^https?:\/\//,"").slice(0,30)+"…":"未配置云端 · 数据仅存本机（配置后可多设备同步）";
+}
+function cloudInitUI(){
+  var u=$("cUrl"),k=$("cKey");
+  if(u)u.value=CLOUD.url;if(k)k.value=CLOUD.key;
+  updCloudUI();
+}
+function cloudSaveCfg(){
+  CLOUD.url=$("cUrl").value.trim();CLOUD.key=$("cKey").value.trim();
+  try{localStorage.setItem("aaa3:cloud",JSON.stringify(CLOUD));}catch(e){}
+  updCloudUI("配置已保存，正在首次同步…");
+  cloudSyncNow(false,true);
+}
+function cloudGet(){
+  if(!cloudConfigured())return Promise.resolve(null);
+  var headers={};
+  if(CLOUD.key)headers["X-Master-Key"]=CLOUD.key;
+  var u=isJsonBin()?(CLOUD.url.replace(/\/+$/,"")+"/latest"):CLOUD.url;
+  return fetch(u,{headers:headers})
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+    .then(function(j){
+      if(j&&j.record&&j.record.items)return j.record;
+      if(j&&j.items)return j;
+      return null;
+    });
+}
+function cloudPut(rec){
+  if(!cloudConfigured())return Promise.resolve(false);
+  var headers={"Content-Type":"application/json"};
+  if(CLOUD.key){if(isJsonBin())headers["X-Master-Key"]=CLOUD.key;else headers["Authorization"]=CLOUD.key;}
+  return fetch(CLOUD.url,{method:"PUT",headers:headers,body:JSON.stringify(rec)})
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return true;});
+}
+var cloudBusy=false,cloudTimer=null;
+function cloudSyncNow(silent,force){
+  if(!cloudConfigured()){if(!silent)updCloudUI("未配置云端 · 数据仅存本机（配置后可多设备同步）");return;}
+  if(cloudBusy&&!force)return;
+  cloudBusy=true;
+  if(!silent)updCloudUI("☁ 同步中…");
+  cloudGet().then(function(rec){
+    var local={updated:S._updated||0,items:filterItems(S)};
+    var merged=rec?mergeRecords(local,rec):local;
+    S=merged.items;S._updated=merged.updated;saveLocal();applyState();
+    return cloudPut({updated:S._updated,items:filterItems(S)});
+  }).then(function(){
+    cloudBusy=false;
+    updCloudUI("☁ 云端已同步（"+new Date().toTimeString().slice(0,8)+"）");
+  }).catch(function(e){
+    cloudBusy=false;
+    updCloudUI("☁ 同步失败："+((e&&e.message)||"网络错误")+" · 将自动重试");
+  });
+}
+function debounceCloud(){clearTimeout(cloudTimer);cloudTimer=setTimeout(function(){cloudSyncNow(true);},1200);}
+document.addEventListener("change",function(e){
+  var t=e.target;
+  if(t&&t.matches&&t.matches("input[data-k]")){
+    if(t.checked)S[t.dataset.k]=Date.now();else S[t.dataset.k]=0;
+    S._updated=Date.now();saveLocal();updCounts();debounceSave();debounceCloud();
+    if(t.closest&&t.closest("#todayBox"))barPulse(t.checked);
+  }
+});
+/* 本周课表：整列连续框（覆盖层绘制） */
+function framePut(el,wrap,table,idx,on){
+  if(!el)return;
+  if(!on||idx<0){el.style.display="none";return;}
+  /* 列宽固定：74px 时段列 + 7 等分 —— 用 calc 精确定位，规避 zoom 坐标问题 */
+  el.style.display="block";
+  el.style.left="calc(74px + (100% - 74px)/7*"+idx+")";
+  el.style.width="calc((100% - 74px)/7)";
+  el.style.top="0px";
+  el.style.height="100%";
+}
+function drawColFrames(){
+  var tb=$("ttBox");if(!tb)return;
+  var wrap=tb.querySelector(".ttwrap"),table=tb.querySelector("table");
+  if(!wrap||!table)return;
+  var tIdx=parseInt(wrap.dataset.today,10),sIdx=parseInt(wrap.dataset.sel,10);
+  if(isNaN(tIdx))tIdx=-1;if(isNaN(sIdx))sIdx=-1;
+  framePut($("frameToday"),wrap,table,tIdx,tIdx>=0);
+  framePut($("frameSel"),wrap,table,sIdx,sIdx>=0&&sIdx!==tIdx);
+  var hv=$("frameHover");
+  if(hv&&hv.dataset.init!=="1"){
+    hv.dataset.init="1";
+    var base=(tIdx>=0)?tIdx:((sIdx>=0)?sIdx:0);
+    framePut(hv,wrap,table,base,true);hv.classList.remove("on");
+  }
+}
+$("ttBox").addEventListener("mouseover",function(e){
+  var hv=$("frameHover");if(!hv)return;
+  var c=e.target.closest&&e.target.closest(".wk2 th,.wk2 td");
+  if(!c||!c.classList.contains("dc")||c.classList.contains("na")){hv.classList.remove("on");return;}
+  var tb=$("ttBox"),wrap=tb.querySelector(".ttwrap"),table=tb.querySelector("table");
+  if(!wrap||!table)return;
+  var tIdx=parseInt(wrap.dataset.today,10),sIdx=parseInt(wrap.dataset.sel,10);
+  var ci=c.cellIndex-1;/* 扣掉左侧「时段」列，映射为日期列序号 */
+  if(ci===tIdx||ci===sIdx){hv.classList.remove("on");return;}
+  framePut(hv,wrap,table,ci,true);
+  hv.classList.add("on");
+});
+$("ttBox").addEventListener("mouseleave",function(){var hv=$("frameHover");if(hv)hv.classList.remove("on");});
+window.addEventListener("resize",drawColFrames);
+
+/* 点击涟漪动效（按钮 / 周选择 / 时间线节点） */
+var RM=matchMedia("(prefers-reduced-motion: reduce)");
+document.addEventListener("pointerdown",function(e){
+  if(RM.matches)return;
+  var el=e.target.closest&&e.target.closest("button.mini,.wkbar .wb,.tlent");
+  if(!el)return;
+  var r=el.getBoundingClientRect(),d=Math.max(r.width,r.height)*1.1;
+  var s=document.createElement("span");s.className="ripple";
+  s.style.width=s.style.height=d+"px";
+  s.style.left=(e.clientX-r.left-d/2)+"px";
+  s.style.top=(e.clientY-r.top-d/2)+"px";
+  el.appendChild(s);
+  s.addEventListener("animationend",function(){if(s.parentNode)s.parentNode.removeChild(s);});
+  setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},800);
+});
+function setBar(bar,c,total){
+  if(!bar)return;
+  var i=bar.querySelector("i");if(!i)return;
+  var pct=total?Math.round(c/total*100):0;
+  i.style.width=pct+"%";
+  bar.classList.toggle("done",total>0&&c>=total);
+}
+function barPulse(done){
+  var b=$("todayBox");if(!b)return;
+  var bar=b.querySelector(".pbar"),tp=$("todayProg");
+  if(bar){bar.classList.remove("pumping");void bar.offsetWidth;bar.classList.add("pumping");}
+  if(tp&&done!==false){tp.classList.remove("pop");void tp.offsetWidth;tp.classList.add("pop");}
+}
+function updCounts(){
+  var box=$("weekBox");
+  if(box&&box.querySelector(".prog")){
+    var all=box.querySelectorAll("input[data-k]"),c=0;
+    all.forEach(function(i){if(i.checked)c++;});
+    box.querySelector(".prog").textContent="本周进度 "+c+"/"+all.length;
+    setBar(box.querySelector(".pbar"),c,all.length);
+  }
+  var tb=$("todayBox");
+  if(tb){
+    var a2=tb.querySelectorAll("input[data-k]"),c2=0;
+    a2.forEach(function(i){if(i.checked)c2++;});
+    var tp=$("todayProg");
+    if(tp)tp.textContent=progLabel+c2+"/"+a2.length;
+    setBar(tb.querySelector(".pbar"),c2,a2.length);
+  }
+}
+
+/* ═══════════ 状态 ═══════════ */
+loadLocal();
+var T=today(),TISO=iso(T),CW=findWeek(TISO);
+var PLAN_START=iso(addD(D(WEEKS[0].mon),WEEKS[0].from));
+var viewId=CW?CW.id:(TISO<PLAN_START?1:9);
+var selDay=TISO;var progLabel="今日进度 ";
+
+/* ═══════════ 时间线（色块分区） ═══════════ */
+function renderTimeline(){
+  var flat=[],curIdx=-1;
+  TL.forEach(function(b){b.items.forEach(function(it){flat.push(it);});});
+  for(var i=0;i<flat.length;i++){
+    var s=flat[i].d,e=flat[i].e||flat[i].d;
+    if(TISO>=s&&TISO<=e){curIdx=i;break;}
+    if(TISO<s)break;
+  }
+  var h="",k=0;
+  TL.forEach(function(b){
+    h+='<div class="tlblk '+b.color+'"><div class="tlbt">'+b.title+'</div>';
+    b.items.forEach(function(it){
+      var d=D(it.d),dtxt=it.lab?it.lab:(it.e?((d.getMonth()+1)+"."+d.getDate()+"–"+(D(it.e).getMonth()+1)+"."+D(it.e).getDate()):((d.getMonth()+1)+"."+d.getDate()+" "+WD[wdIdx(d)]));
+      h+='<div class="tlent'+(k===curIdx?" tlact":"")+'" onclick="tlGoT(this,'+it.w+(it.extra?",1":"")+')" title="跳转到 W'+it.w+'">'+
+         '<div class="tld">'+dtxt+(k===curIdx?'<span class="jin">今</span>':"")+'</div>'+
+         '<div class="tlt">'+it.t+'</div></div>';
+      k++;
+    });
+    h+='</div>';
+  });
+  $("tlBox").innerHTML=h;
+}
+function tlGoT(el,w,extra){tlGo(w,el,extra?"extra":undefined);}
+
+/* ═══════════ 周选择（右栏） ═══════════ */
+function renderNav(){
+  var h='';
+  WEEKS.forEach(function(w){
+    var d=addD(D(w.mon),w.from);
+    h+='<button class="wb'+(w.id===viewId?" on":"")+(CW&&w.id===CW.id?" cur":"")+'" onclick="selWeek('+w.id+')" title="W'+w.id+' '+w.title+'">W'+w.id+'<small>'+(d.getMonth()+1)+"."+d.getDate()+'</small></button>';
+  });
+  h+='<button class="mini" onclick="gotoCur()" id="btnCur"'+((!CW||viewId===CW.id)?" disabled":"")+'>↩ 回到本周</button>';
+  $("wkbar").innerHTML=h;
+}
+function selWeek(id){viewId=id;renderNav();renderWeek(id);renderWeekTable(id);}
+function gotoCur(){if(CW)selWeek(CW.id);}
+function tlGo(w,el,anchor){
+  if(w)selWeek(w);
+  var target=(anchor==="extra")?$("extraH"):$("weekPanel");
+  if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+  var wp=$("weekPanel");
+  if(wp&&anchor!=="extra"){wp.classList.remove("flash");void wp.offsetWidth;wp.classList.add("flash");}
+  document.querySelectorAll(".tlent").forEach(function(x){x.classList.remove("tlact");});
+  if(el)el.classList.add("tlact");
+}
+
+/* ═══════════ 当周任务 ═══════════ */
+function renderWeek(id){
+  var w=WEEKS[id-1];
+  var h='<div class="panim wkfix"><div class="weekhead"><span class="wid">W'+w.id+'</span><span class="wt">'+w.title+'</span>'+
+   '<span class="wd">'+md(addD(D(w.mon),w.from))+' – '+md(addD(D(w.mon),6))+
+   (w.ph==="一"?" · 阶段一（模板A）":" · 阶段三（模板B）")+'</span></div>';
+  if(w.math.length){h+='<div class="wcol"><div class="lab tA">数学任务</div><ul>'+w.math.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul></div>';}
+  else{h+='<div class="wcol"><div class="lab tA">数学任务</div><div class="gray">竞赛已结束 · 全力六级</div></div>';}
+  h+='<div class="wcol"><div class="lab tE">英语任务</div><ul>'+w.eng.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul></div>';
+  h+='<div class="mile">'+w.miles.map(function(m,i){return chk("w"+w.id+"-m"+i,m);}).join("")+'</div>';
+  h+='<div class="pbar"><i></i></div><div class="progline"><span class="prog"></span>'+
+     '<button class="mini" onclick="resetWeek('+w.id+')">重置本周</button></div></div>';
+  $("weekBox").innerHTML=h;
+  updCounts();
+}
+function resetWeek(id){var pre="w"+id+"-";Object.keys(S).forEach(function(k){if(k.indexOf(pre)===0)S[k]=0;});S._updated=Date.now();saveLocal();renderWeek(id);autosave();debounceCloud();}
+
+/* ═══════════ 今日任务（时长 + 任务 + 工具 + 打卡） ═══════════ */
+function dayRows(dateISO){
+  var w=findWeek(dateISO);
+  var ph=w?w.ph:(dateISO<PLAN_START?"一":"三");
+  var ti=wdIdx(D(dateISO)),t=TMPL[ph],rows=[];
+  var listen=isListenDay(dateISO),mat=listenMat(dateISO);
+  if(ph==="一"){
+    rows.push(["m","早上",t.morning.dur,[t.morning.t],t.morning.tool,0]);
+    if(listen)rows.push(["n","中午",t.noon.dur,[t.noon.t,mat],["材料："+mat].concat(t.noon.tool),0,1]);
+    else rows.push(["n","中午",t.read.dur,[t.read.t],t.read.tool,1]);
+    if(listen)rows.push(["f","白天",t.ft.dur,[t.ft.t],t.ft.tool,1]);
+    else rows.push(["f","白天",t.nb.dur,[t.nb.t],t.nb.tool,1]);
+    var ev=w?w.eve[ti]:null;
+    if(ev)rows.push(["g","晚上","60–70′",[ev.t],toolOf(ev,ph),ev.k==="rest"?1:0]);
+    rows.push(["s","睡前",t.sleep.dur,[t.sleep.t],t.sleep.tool,0]);
+  }else{
+    rows.push(["m","早上",t.morning.dur,[t.morning.t],t.morning.tool,0]);
+    rows.push(["n","中午",t.noon.dur,[t.noon.t,mat],["材料："+mat].concat(t.noon.tool),0,1]);
+    rows.push(["f","傍晚",t.frag.dur,[t.frag.t],t.frag.tool,1]);
+    var ev2=w?w.eve[ti]:null;
+    if(ev2)rows.push(["g","晚上","60′",[ev2.t],toolOf(ev2,ph),ev2.k==="write"?1:0]);
+    rows.push(["s","睡前",t.sleep.dur,[t.sleep.t],t.sleep.tool,0]);
+  }
+  return rows;
+}
+function renderDay(){
+  var rows,title="",k="d-"+selDay+"-";
+  var isToday=(selDay===TISO);
+  if(isToday&&!CW&&TISO<PLAN_START){
+    rows=[["p0","晚上","20′",["① 报名确认：核对报名与缴费状态（非数学B类）"],["联系学院竞赛负责人 / 教务处"],0],
+      ["p1","晚上","—",["② 装备：墨墨解锁「CET6 核心词汇」；装 不背单词、每日英语听力"],["APP 商店 / 墨墨内购"],1],
+      ["p2","晚上","—",["③ 材料：下载 16 届（2024）非数学B类真题 + 答案；备 A4 错题本"],["cmathc.org.cn 初赛试题栏目"],1]];
+    title="（计划 10.13 周二正式启动 · 先完成今晚准备）";
+  }else if(!CW&&selDay>EXAM_E){
+    rows=[["done","","—",["全部考试已结束——CET6 已于 12.12 完成。若入围数学竞赛决赛（2027.4 大连理工），届时另立计划。"],[""],-1]];
+  }else{
+    rows=dayRows(selDay);
+    var dw=findWeek(selDay);
+    title="（"+WD[wdIdx(D(selDay))]+" "+md(D(selDay))+(dw?" · W"+dw.id+" "+dw.title:"")+"）";
+  }
+  $("todayHeadTxt").textContent=isToday?"今日任务":md(D(selDay))+" 任务";
+  progLabel=isToday?"今日进度 ":"当日进度 ";
+  var h='<table class="tt"><tr><th style="width:64px">时段</th><th style="width:28%">任务</th><th>工具 · 执行方法</th><th style="width:54px">优先级</th><th style="width:50px">打卡</th></tr>';
+  rows.forEach(function(r){
+    var pri=(r[5]>=0)?'<span class="pc p'+r[5]+'">P'+r[5]+'</span>':'—';
+    function cst(i){return ' style="animation:rowQuick .18s ease both;animation-delay:'+(i*30)+'ms"';}/* 从左到右逐列渐显 */
+    h+='<tr class="todayrow"><td class="dur"'+cst(0)+'><span class="per">'+esc(r[1])+'</span>'+esc(r[2])+'</td><td class="task"'+cst(1)+'>'+(r[6]?blp(r[3]):bl(r[3]))+'</td><td class="tool"'+cst(2)+'>'+bl(r[4])+'</td>'+
+       '<td class="pri"'+cst(3)+'>'+pri+'</td><td class="ck"'+cst(4)+'><input type="checkbox" data-k="'+k+r[0]+'"'+(S[k+r[0]]?" checked":"")+'></td></tr>';
+  });
+  h+='</table>';
+  h+='<div class="progline"><div class="pbar"><i></i></div><span class="gray" id="todayProg"></span>'+
+     '<button class="mini" style="margin-left:auto;position:relative;top:3px" onclick="resetToday()">'+(isToday?"重置今日":"重置当日")+'</button>'+
+     (isToday?"":'<button class="mini" style="position:relative;top:3px" onclick="gotoTodayDay()">↩ 回到今天</button>')+
+     '</div>';
+  $("todayBox").innerHTML=h;
+  $("todayTitle").textContent=title;
+  updCounts();
+}
+function resetToday(){var pre="d-"+selDay+"-";Object.keys(S).forEach(function(kk){if(kk.indexOf(pre)===0)S[kk]=0;});S._updated=Date.now();saveLocal();renderDay();autosave();debounceCloud();}
+function gotoTodayDay(){selDay=TISO;renderDay();renderWeekTable(viewId);}
+function pickDay(d){selDay=d;renderDay();renderWeekTable(viewId);}
+
+/* ═══════════ 本周课表 ═══════════ */
+function renderWeekTable(id){
+  var w=WEEKS[id-1],monD=D(w.mon);
+  var dur={ "一":{m:"15′",n:"15′",f:"10′",g:"60–70′",s:"10′"},
+            "三":{m:"15–20′",n:"25–30′",f:"10′",g:"60′",s:"10′"} }[w.ph];
+  function diso(i){return iso(addD(monD,i));}
+  var h='<div class="panim"><div class="ttwrap" id="ttWrap"><table class="tt wk2"><colgroup><col style="width:74px"><col span="7"></colgroup><tr><th>时段</th>';
+  var tIdx=-1,sIdx=-1;
+  for(var i=0;i<7;i++){
+    var d=addD(monD,i),inR=(i>=w.from&&i<=w.to);
+    var isTd=(diso(i)===TISO),isSd=(diso(i)===selDay);
+    var cls="dc"+(isTd?" today":(isSd?" sel":""))+(inR?"":" na");
+    if(isTd)tIdx=i;if(isSd)sIdx=i;
+    var bdg=isTd?' <span class="badge">今天</span>':(isSd?' <span class="badge sb">已选</span>':"");
+    h+='<th class="'+cls+'"'+(inR?' onclick="pickDay(\''+diso(i)+'\')"':'')+'>'+WD[i]+'<br><span style="font-weight:400;font-size:10px">'+(d.getMonth()+1)+"."+d.getDate()+bdg+'</span></th>';
+  }
+  h+='</tr>';
+  function rowlab(l,dr){return '<td class="tm">'+l+'<small>'+dr+'</small></td>';}
+  function cell(i,fn){
+    var inR=(i>=w.from&&i<=w.to);
+    var isTd=(diso(i)===TISO),isSd=(diso(i)===selDay);
+    var cls="dc"+(isTd?" today":(isSd?" sel":""))+(inR?"":"na");
+    return '<td class="'+cls+'"'+(inR?' onclick="pickDay(\''+diso(i)+'\')"':'')+'>'+(inR?fn():"—")+'</td>';
+  }
+  h+='<tr>'+rowlab("早起",dur.m)+[0,1,2,3,4,5,6].map(function(i){return cell(i,function(){return "墨墨单词";});}).join("")+'</tr>';
+  h+='<tr>'+rowlab("午间",dur.n)+[0,1,2,3,4,5,6].map(function(i){return cell(i,function(){
+    if(w.ph==="三")return "精听+泛听";
+    return isListenDay(diso(i))?"精听 1 篇":'<span style="color:var(--blue)">阅读 1 篇</span>';});}).join("")+'</tr>';
+  h+='<tr>'+rowlab(w.ph==="一"?"课间":"傍晚",dur.f)+[0,1,2,3,4,5,6].map(function(i){return cell(i,function(){
+    if(w.ph==="三")return "僻义清单";
+    return isListenDay(diso(i))?"泛听":"不背例句";});}).join("")+'</tr>';
+  h+='<tr>'+rowlab("晚间",dur.g)+[0,1,2,3,4,5,6].map(function(i){return cell(i,function(){
+    var ev=w.eve[i];if(!ev)return "—";
+    var cls=ev.k==="sim"?"e-sim":(ev.k==="limit"?"e-lim":"");
+    return '<span class="'+cls+'">'+ev.t+'</span>';});}).join("")+'</tr>';
+  h+='<tr>'+rowlab("睡前",dur.s)+[0,1,2,3,4,5,6].map(function(i){return cell(i,function(){
+    return w.ph==="一"?"错题+单词":"复盘+单词";});}).join("")+'</tr>';
+  h+='</table><div id="frameToday" class="colframe"></div><div id="frameSel" class="colframe"></div><div id="frameHover" class="colframe"></div></div>';
+  var selInW=(selDay>=iso(addD(monD,w.from))&&selDay<=iso(addD(monD,6)));
+  var cap='深蓝列 = 今天（'+md(T)+' '+WD[wdIdx(T)]+'）';
+  if(selDay!==TISO&&selInW)cap+='，浅蓝列 = 选中（'+md(D(selDay))+' '+WD[wdIdx(D(selDay))]+'）';
+  cap+='；点任意日期可切换当日任务；「—」= 不在本计划周内。';
+  h+='<p class="gray" style="margin:7px 0 0">'+cap+'</p></div>';
+  $("ttBox").innerHTML=h;
+  var wrap=$("ttWrap");
+  if(wrap){wrap.dataset.today=tIdx;wrap.dataset.sel=sIdx;}
+  drawColFrames();requestAnimationFrame(drawColFrames);
+  $("ttTitle").textContent="（W"+w.id+" · "+md(monD)+" – "+md(addD(monD,6))+"）";
+}
+
+/* ═══════════ 右栏 ═══════════ */
+function renderCounts(){
+  var dm=daysTo(EXAM_M),de=daysTo(EXAM_E),h='<div class="cntbox">';
+  h+='<div class="cnt m"><div class="cntN">'+((dm>0)?dm+"<small>天</small>":(dm===0?"0<small>天</small>":"✓"))+'</div><div class="cntL">距数学竞赛 · 11.14</div></div>';
+  h+='<div class="cnt e"><div class="cntN">'+((de>0)?de+"<small>天</small>":(de===0?"0<small>天</small>":"✓"))+'</div><div class="cntL">距 CET6 · 12.12</div></div>';
+  h+='</div>';
+  $("countBox").innerHTML=h;
+}
+function renderRight(){renderCounts();updSaveUI();}
+
+/* ═══════════ 补充信息 ═══════════ */
+function renderExtra(){
+  var o='<table class="doc"><tr><th>周</th><th>日期</th><th>主题</th><th>数学</th><th>英语</th></tr>';
+  WEEKS.forEach(function(w){
+    var end=addD(D(w.mon),6);
+    o+='<tr><td><b>W'+w.id+'</b></td><td>'+(D(w.mon).getMonth()+1)+'.'+D(w.mon).getDate()+'–'+(end.getMonth()+1)+'.'+end.getDate()+'</td><td>'+w.title+'</td><td>'+(w.math[0]||"—")+'</td><td>'+w.eng[0]+'</td></tr>';
+  });
+  o+='</table>';
+  $("overviewBox").innerHTML=o;
+  $("methodBox").innerHTML=
+   '<div class="mgrid">'+
+   '<div class="mcard"><h5><span class="tE">单词</span>墨墨主力 + 不背辅助</h5>'+
+     '<table class="doc"><tr><th>工具</th><th>每日量</th><th>时段</th></tr>'+
+     '<tr><td>墨墨（主力）</td><td>40 新词 + 复习（15–20′）</td><td>早起 + 睡前</td></tr>'+
+     '<tr><td>不背单词（辅助）</td><td>看 10–15 个例句</td><td>课间 / 走路</td></tr></table>'+
+     '<div class="mnote">「不背单词」= 看例句记语境、不背拼写；墨墨只认义（作文高频 100 词除外）；复习 >100 词 → 新词降 25；12.8 起只复习。</div></div>'+
+   '<div class="mcard"><h5><span class="tE">听力</span>精听五步法 · 每日 1 篇</h5>'+
+     '<div class="flowline"><span class="fchip">① 盲听抓主旨 1′</span><span class="farrow">→</span><span class="fchip">② 逐句听写 6′</span><span class="farrow">→</span><span class="fchip">③ 对照纠错 3′</span><span class="farrow">→</span><span class="fchip">④ 跟读模仿 2′</span><span class="farrow">→</span><span class="fchip">⑤ 归纳 1′</span></div>'+
+     '<div class="mnote">阶段一与阅读隔日轮换；B（听力篇章）↔ C（讲座）交替精听，每套真题先 B 后 C。三类失分点：语音（连读/弱读/失爆）｜熟词僻义（fine=罚款 check=寄存）｜信号词后（but/however/therefore）。</div></div>'+
+   '<div class="mcard"><h5><span class="tE">阅读</span>三步法 · 每日 1 篇 + 5′ 复盘</h5>'+
+     '<div class="flowline"><span class="fchip">① 题干定位 30″</span><span class="farrow">→</span><span class="fchip">② 定位句±1 判逻辑</span><span class="farrow">→</span><span class="fchip">③ 选项比对</span></div>'+
+     '<div class="mnote">阶段一与精听隔日轮换。复盘三件套：标定位句 ／ 抄替换词 ／ 贴错因（夸大·偷换·无中生有）。顺序：匹配 → 仔细 → 选词；选词 5–7′ 熔断。</div></div>'+
+   '<div class="mcard"><h5><span class="tE">写译</span>每周各 1–2 次</h5>'+
+     '<div class="flowline"><span class="fchip hot">写作 · 3 套框架</span><span class="fchip">引入</span><span class="farrow">→</span><span class="fchip">论点+例证</span><span class="farrow">→</span><span class="fchip">让步</span><span class="farrow">→</span><span class="fchip">结论</span></div>'+
+     '<div class="flowline" style="margin-top:5px"><span class="fchip hot">翻译 · 四步</span><span class="fchip">通读</span><span class="farrow">→</span><span class="fchip">拆句</span><span class="farrow">→</span><span class="fchip">选词</span><span class="farrow">→</span><span class="fchip">检查</span></div>'+
+     '<div class="mnote">话题库：科技 / 社会 / 青年；表达库：文化 + 社会发展 ≥40 条。</div></div>'+
+   '<div class="mcard"><h5><span class="tA">数学计算</span>每日 10′ · 三查法</h5>'+
+     '<div class="flowline"><span class="fchip hot">查条件</span><span class="farrow">→</span><span class="fchip hot">查符号常数</span><span class="farrow">→</span><span class="fchip hot">查回代</span></div>'+
+     '<div class="mnote">易错 5 类：分部积分符号 ／ 隐函数二阶导 ／ 极值判别号 ／ 换序边界 ／ 幂级数端点。每日 3–5 道高错率题。</div></div>'+
+   '<div class="mcard"><h5><span class="tA">中档限时</span>每周六 30′</h5>'+
+     '<div class="flowline"><span class="fchip">6–8 题闭卷</span><span class="farrow">→</span><span class="fchip">当场对答案</span><span class="farrow">→</span><span class="fchip">归因贴标签</span></div>'+
+     '<div class="mnote">达标：≥85% 且 0 低级失误；练的是基本盘 58 分（填空 30 + 前两大题 28）。</div></div>'+
+   '</div>';
+  $("matBox").innerHTML='<ul>'+
+   '<li><b>《全国大学生数学竞赛解析教程（非数学专业类）（第2版·上下册）》</b>（命题组编）——专题主教材。</li>'+
+   '<li><b>历届真题（15–17届，B卷优先）</b>——cmathc.org.cn 免费下载；16届诊断、17届拆专题、15届做模拟#2。</li>'+
+   '<li><b>数学错题本（A4 手写）</b>——每题五栏：抄题→错解→错因→正解→检查点一句话。</li>'+
+   '<li><b>六级真题卷（2023.12–2025.12 纸质）</b>——精听/阅读/模考唯一材料源。</li>'+
+   '<li><b>墨墨 + 不背单词 + 每日英语听力</b>——单词主力 / 语境辅助 / 泛听音频。</li>'+
+   '<li><b>框架本 + 替换本 + 僻义清单</b>——随手记，每周日合并整理。</li></ul>';
+  $("riskBox").innerHTML=
+   '<div class="prioHead"><b>优先级铁律</b><span class="most">最重要</span></div>'+
+   '<div class="p0"><div class="p0t"><span class="lchip r">P0</span>不可省略</div><div class="cards">'+
+     card("晚间数学主线 60–70′","含 10′ 计算专项 · 阶段一命脉")+
+     card("墨墨单词 每日 15–20′","保持记忆曲线连续")+
+     card("午间精听 15–25′","听力最大短板 · 提分路径")+
+     card("晚间轮换 60′（阶段三）","阅读 + 听力双核阵地")+
+     card("睡前复盘 10′","错题转化为分数")+
+     card("整块模拟 ×4","11.08 / 11.11 / 周末拆分模考 ×3")+
+   '</div></div>'+
+   '<div class="p1"><div class="p0t"><span class="lchip y">P1</span>可压缩</div><div class="cards">'+
+     card("课间碎片 10′","可跳过 · 不伤主线")+
+     card("选词填空","5–7′ 到点即弃")+
+     card("中档限时 30′","可压缩为 15′")+
+     card("长篇匹配","每周 2 篇可降 1 篇")+
+     card("写译专项","可改默读范文 / 框架")+
+   '</div></div>'+
+   '<div class="p2"><div class="p0t"><span class="lchip g">P2</span>可舍弃</div><div class="cards">'+
+     card("级数深挖","保常见套路即可")+
+     card("额外核听","主线材料足够")+
+   '</div></div>'+
+   '<p style="margin-top:10px"><b>3 天熔断：</b>欠账 ≤3 天周末补；第 4 天起启动精简日 60′（单词10+精听15+竞赛或阅读35），追平后恢复，绝不滚动到下周。</p>'+
+   '<p><b>保底日 30′</b>（课业爆炸/初愈，每周≤2天）：墨墨10 + 精听15 + 睡前错题5。生病 ≥3 天：第1天单词+1篇精听 → 第2天加竞赛40′ → 第3天恢复。</p>'+
+   '<p><b>时间冲突：</b>①竞赛整卷 150′ 超 120′ 上限 → 仅 11.8、11.11 两个「模考例外日」破线。②六级全卷 145′ → 拆周六「听力+阅读+复盘」/ 周日「写作+翻译+自评」，各 ≤120′。</p>'+
+   '<p><b>模考失利协议：</b>当天只做错因归类（知识/计算/审题/时间）；次日只补 TOP1 错因一组 40′；禁止连续两晚崩溃式补练。</p>';
+  $("examBox").innerHTML=
+   '<table class="doc"><tr><th colspan="2" style="background:#dbeafe">🏆 11.14（六）数学竞赛</th></tr>'+
+   '<tr><td style="width:110px">07:00–08:00</td><td>正常早餐；翻错题本「检查点一句话」清单（只看这个，不刷题）</td></tr>'+
+   '<tr><td>08:15–08:40</td><td>到场；携带：身份证、准考证、黑笔×2、2B、橡皮、直尺、手表（一般不允许计算器）</td></tr>'+
+   '<tr><td>09:00–11:30</td><td>填空≤45′ → 大题每题 15–18′ → 最后 10′ 只检查。压轴先写第一问；定理条件写全；答案框出</td></tr>'+
+   '<tr><td>考后</td><td>不对答案不讨论；成绩与决赛线以赛区通知为准</td></tr></table>'+
+   '<table class="doc"><tr><th colspan="2" style="background:#fee2e2">🎯 12.12（六）CET6</th></tr>'+
+   '<tr><td style="width:110px">13:00 前</td><td>午餐正常量；午休 20–30′，闹钟双保险</td></tr>'+
+   '<tr><td>14:40 入场</td><td>带：准考证（12.1 起打印）、身份证、学生证、2B×2、黑笔×2、听力耳机+备用电池（提前一天调频试音）</td></tr>'+
+   '<tr><td>15:00–15:30</td><td>写作：审题 3′ → 写 22′ → 检查 5′（拼写/时态/连接词）</td></tr>'+
+   '<tr><td>15:40–16:10</td><td>听力：预读选项圈关键词；结束立即收答题卡1（作文+听力）</td></tr>'+
+   '<tr><td>16:10–17:25</td><td>阅读+翻译：选词≤7′ → 匹配≤12′ → 仔细 25′ → 缓冲 6′ → 翻译 20′</td></tr></table>';
+  $("srcBox").innerHTML='<ul class="gray">'+
+   '<li>中国数学会：18届通知——初赛 2026.11.14（六）9:00–11:30；决赛 2027.4 大连理工；初赛内容=高等数学；获奖 ≤30%（6%/9%/15% 按类别分别评奖）。</li>'+
+   '<li>大学生数学竞赛网 cmathc.org.cn：历届真题下载；17届B卷结构（填空5×6 + 解答5×14）与考点分析。</li>'+
+   '<li>教育部教育考试院：2026 下半年四六级笔试 2026.12.12（六）15:00–17:25；准考证 12.1 起打印。</li>'+
+   '<li>六级考情（新东方等）：讲座分层笔记、阅读三步法、选词填空止损策略。</li></ul>';
+}
+function autoOpenDetails(){
+  var dm=daysTo(EXAM_M),de=daysTo(EXAM_E);
+  var nearM=(dm>=0&&dm<=3),nearE=(de>=0&&de<=3);
+  var target=nearM||nearE?$("d3"):$("d2");
+  target.open=true;
+  var rec=document.createElement("span");rec.className="rec";rec.textContent="当前推荐";
+  target.querySelector("summary").appendChild(rec);
+}
+
+/* ═══════════ 打印版 ═══════════ */
+function buildPrint(){
+  var r=$("printRoot");if(r.dataset.built==="1")return;r.dataset.built="1";
+  var h='<h1>AAA 冲刺计划（完整版）</h1><p class="meta">数学竞赛省一 × CET6 450+ ｜ 2026.10.13 – 12.12 ｜ 每日 ≤120 分钟 ｜ 生成于 '+TISO+'</p>';
+  h+='<h2>关键节点</h2><ul class="meta">'+
+   '<li>10.13 启动 → 10.15 诊断完成 → 10.16–11.8 专题突破（每周六中档限时）</li>'+
+   '<li>11.8 全真模拟#1（模考例外日）｜ 11.11 全真模拟#2 ｜ <b>11.14 竞赛初赛 9:00–11:30</b></li>'+
+   '<li>11.15 过渡休整 ｜ 11.16–12.11 六级总攻（11.21/28、12.5 拆分模考×3）｜ 12.1 打印准考证</li>'+
+   '<li>12.7–11 保温周（不刷新题）｜ <b>12.12 CET6 15:00–17:25</b> ｜ 分支：若入围 → 2027.4 决赛（大连理工，高数+线代）</li></ul>';
+  h+='<h2>九周详表</h2>';
+  WEEKS.forEach(function(w){
+    var end=addD(D(w.mon),6);
+    h+='<h3>W'+w.id+' · '+w.title+'（'+md(D(w.mon))+'–'+md(end)+'）</h3>';
+    h+='<div class="meta">数学：'+(w.math.length?w.math.join("；"):"—")+' ｜ 英语：'+w.eng.join("；")+'</div>';
+    h+='<div class="meta">里程碑：☐ '+w.miles.join(" ｜ ☐ ")+'</div>';
+    h+='<table><tr><th style="width:110px">日期</th><th>晚间主线（其余时段按模板）</th></tr>';
+    for(var i=0;i<7;i++){
+      if(i<w.from||i>w.to)continue;
+      var d=addD(D(w.mon),i),ev=w.eve[i];
+      h+='<tr><td>'+WD[i]+' '+(d.getMonth()+1)+'.'+d.getDate()+'</td><td>'+(ev?esc(ev.t):"—")+'</td></tr>';
+    }
+    h+='</table>';
+  });
+  h+='<h2>每日模板</h2><table><tr><th>模板</th><th>时段（时长）</th><th>内容</th><th>工具·方法</th></tr>'+
+   '<tr><td rowspan="5">A（阶段一）</td><td>早起 15′</td><td>墨墨 40 词</td><td>只认义不拼写；复习>100 词不加新词</td></tr>'+
+   '<tr><td>午间 15′（+12′）</td><td>精听 或 阅读（隔日轮换）</td><td>五步法 / 三步法；听力 B/C 交替</td></tr>'+
+   '<tr><td>课间 10′</td><td>不背例句 / 泛听（隔日轮换）</td><td>走路/排队进行</td></tr>'+
+   '<tr><td>晚间 60–70′</td><td>竞赛专题 / 模拟</td><td>要点15′→练习40′→归因10′（含计算专项）</td></tr>'+
+   '<tr><td>睡前 10′</td><td>错题回顾 + 墨墨扫尾</td><td>错题本 · 明日任务 1 行</td></tr>'+
+   '<tr><td rowspan="5">B（阶段三）</td><td>早起 15–20′</td><td>墨墨 40 词+复习</td><td>12.8 起停止新词只复习</td></tr>'+
+   '<tr><td>午间 25–30′</td><td>精听 1 篇 + 泛听</td><td>材料 B/C 交替 · 分层笔记</td></tr>'+
+   '<tr><td>傍晚 10′</td><td>僻义清单扫读</td><td>不背单词同步刷例句</td></tr>'+
+   '<tr><td>晚间 60′</td><td>轮换：一三五阅读 / 二四听力 / 六写译 / 日复盘</td><td>真题 + 限时 + 归因表</td></tr>'+
+   '<tr><td>睡前 10′</td><td>复盘 3 行 + 墨墨扫尾</td><td>明日任务卡</td></tr></table>';
+  h+='<h2>方法与专项</h2>'+$("methodBox").innerHTML;
+  h+='<h2>考试日执行卡</h2>'+$("examBox").innerHTML;
+  h+='<h2>优先级铁律 & 弹性调整</h2>'+$("riskBox").innerHTML;
+  h+='<h2>资料清单</h2>'+$("matBox").innerHTML;
+  h+='<h2>情报来源</h2>'+$("srcBox").innerHTML;
+  r.innerHTML=h;
+}
+
+/* ═══════════ 每分钟自动刷新 / 跨天重载 ═══════════ */
+var tickN=0;
+setInterval(function(){
+  if(window.__TODAY_OVERRIDE__)return;
+  if(iso(new Date())!==TISO){location.reload();return;}
+  renderCounts();renderGreet();
+  if((++tickN)%5===0&&cloudConfigured())cloudSyncNow(true);
+},60000);
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState!=="visible")return;
+  if(!window.__TODAY_OVERRIDE__&&iso(new Date())!==TISO){location.reload();return;}
+  if(cloudConfigured())cloudSyncNow(true);
+});
+
+/* ═══════════ 启动 ═══════════ */
+function init(){
+  renderGreet();
+  renderTimeline();
+  renderNav();
+  renderWeek(viewId);
+  renderDay();
+  renderWeekTable(viewId);
+  renderExtra();
+  renderRight();
+  autoOpenDetails();
+  idbGet("dir").then(function(h){
+    if(!h)return;dirHandle=h;
+    dirHandle.queryPermission({mode:"readwrite"}).then(function(p){
+      if(p==="granted"){fileStatus="bound";updSaveUI();readFileAndMerge(false);}
+      else{fileStatus="needperm";updSaveUI();}
+    });
+  }).catch(function(){});
+  /* 补充信息：展开后自动滚动凸显 */
+  var bootT=false;setTimeout(function(){bootT=true;},900);
+  ["d1","d2","d3","d4","d5","d6"].forEach(function(id){
+    var d=$(id);if(!d)return;
+    d.addEventListener("toggle",function(){
+      if(!bootT)return;
+      if(d.open){setTimeout(function(){d.scrollIntoView({behavior:"smooth",block:"nearest"});},380);}
+    });
+  });
+  cloudInitUI();
+  if(cloudConfigured())cloudSyncNow(true);
+  if(window.__PRINT_MODE__){buildPrint();}
+}
+init();
+if(!window.__PRINT_MODE__){window.addEventListener("beforeprint",buildPrint);}
+</script>
+</body>
+</html>
