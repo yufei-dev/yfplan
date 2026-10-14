@@ -745,8 +745,14 @@ function mergeRecords(a,b){/* 逐键按时间戳取新（值为 0 表示"取消�
   });
   return {updated:Math.max(a.updated||0,b.updated||0),items:it};
 }
-var CLOUD={url:"",key:""};
-try{var _cj=localStorage.getItem("aaa3:cloud");if(_cj){var _co=JSON.parse(_cj);CLOUD.url=_co.url||"";CLOUD.key=_co.key||"";}}catch(e){}
+var CLOUD={url:"",key:"",header:"X-Master-Key"};
+/* ★ 部署级内置云配置：由我来填好后重新上传网页，所有设备开箱即用、无需输入
+   header 填 "X-Master-Key"（全账号密钥）或 "X-Access-Key"（仅本桶的受限密钥，更安全） */
+var CLOUD_DEFAULT={url:"https://yfxx.weiyf.ccwu.cc",key:"",header:"X-Master-Key"};
+var cloudFromDefault=false;
+try{var _cj=localStorage.getItem("aaa3:cloud");if(_cj){var _co=JSON.parse(_cj);CLOUD.url=_co.url||"";CLOUD.key=_co.key||"";CLOUD.header=_co.header||"X-Master-Key";}}catch(e){}
+if(!CLOUD.url&&CLOUD_DEFAULT.url){CLOUD.url=CLOUD_DEFAULT.url;CLOUD.key=CLOUD_DEFAULT.key;CLOUD.header=CLOUD_DEFAULT.header||"X-Master-Key";cloudFromDefault=true;}
+function authHeaders(){var h={};if(CLOUD.key)h[CLOUD.header||"X-Master-Key"]=CLOUD.key;return h;}
 function cloudConfigured(){return !!CLOUD.url;}
 function isJsonBin(){return CLOUD.url.indexOf("jsonbin")>=0;}
 function updCloudUI(msg){
@@ -756,19 +762,21 @@ function updCloudUI(msg){
 }
 function cloudInitUI(){
   var u=$("cUrl"),k=$("cKey");
-  if(u)u.value=CLOUD.url;if(k)k.value=CLOUD.key;
+  if(u)u.value=cloudFromDefault?"":CLOUD.url;
+  if(k)k.value=cloudFromDefault?"":CLOUD.key;
+  if(cloudFromDefault&&u&&k){u.placeholder="已内置云端配置 · 无需填写";k.placeholder="已内置云端配置 · 无需填写";}
   updCloudUI();
 }
 function cloudSaveCfg(){
   CLOUD.url=$("cUrl").value.trim();CLOUD.key=$("cKey").value.trim();
+  CLOUD.header=CLOUD.header||"X-Master-Key";cloudFromDefault=false;
   try{localStorage.setItem("aaa3:cloud",JSON.stringify(CLOUD));}catch(e){}
   updCloudUI("配置已保存，正在首次同步…");
   cloudSyncNow(false,true);
 }
 function cloudGet(){
   if(!cloudConfigured())return Promise.resolve(null);
-  var headers={};
-  if(CLOUD.key)headers["X-Master-Key"]=CLOUD.key;
+  var headers=authHeaders();
   var u=isJsonBin()?(CLOUD.url.replace(/\/+$/,"")+"/latest"):CLOUD.url;
   return fetch(u,{headers:headers})
     .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
@@ -781,7 +789,7 @@ function cloudGet(){
 function cloudPut(rec){
   if(!cloudConfigured())return Promise.resolve(false);
   var headers={"Content-Type":"application/json"};
-  if(CLOUD.key){if(isJsonBin())headers["X-Master-Key"]=CLOUD.key;else headers["Authorization"]=CLOUD.key;}
+  if(CLOUD.key){if(isJsonBin())headers[CLOUD.header||"X-Master-Key"]=CLOUD.key;else headers["Authorization"]=CLOUD.key;}
   return fetch(CLOUD.url,{method:"PUT",headers:headers,body:JSON.stringify(rec)})
     .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return true;});
 }
