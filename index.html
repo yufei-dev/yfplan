@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="color-scheme" content="light">
 <meta name="viewport" content="width=1280">
-<title>AAA 冲刺计划 · 交互版（数学竞赛 × CET6）</title>
+<title>于飞计划 · 学习与目标管理</title>
 <style>
 :root{--blue:#1e50c8;--blue-l:#eef3ff;--blue-b:#bcd0f7;--org:#c2410c;--org-l:#fff4ec;--ink:#0f172a;--mut:#64748b;
   --line:#e2e8f0;--line2:#cbd5e1;--amber:#b45309;--red:#dc2626;--green:#15803d;
@@ -355,7 +355,7 @@ summary:hover{background:#f1f5f9}
     <section class="bigcard">
     <div class="sechead navy" id="extraH">📎 补充信息 <span class="sub">按重要性排序 · 点击标题展开</span></div>
     <div class="detailsShell">
-    <details id="d1"><summary>① 九周总览表</summary><div class="dbody" id="overviewBox"></div></details>
+    <details id="d1"><summary id="ovSum">① 九周总览表</summary><div class="dbody" id="overviewBox"></div></details>
     <details id="d2"><summary>② 方法与专项卡（单词 / 听力 / 阅读 / 写译 / 数学计算）</summary><div class="dbody" id="methodBox"></div></details>
     <details id="d3"><summary>③ 考试日执行卡（11.14 竞赛 · 12.12 六级）</summary><div class="dbody" id="examBox"></div></details>
     <details id="d4"><summary>④ 优先级铁律 & 弹性调整</summary><div class="dbody" id="riskBox"></div></details>
@@ -407,6 +407,19 @@ summary:hover{background:#f1f5f9}
 <noscript><p style="padding:20px">此页面需要启用 JavaScript 以显示交互功能。</p></noscript>
 
 <script>
+/* ═══════════ 计划配置 ═══════════
+   品牌与文案规范见 docs/BRAND.md。
+   这些字段将来由「用户数据」提供（多用户系统），此处是单用户默认值。
+   改这里即可换名称，不要在页面各处写死。 */
+var PLAN={
+  brand  : "于飞计划",                       /* 品牌名 —— 浏览器标签 / 页眉 */
+  en     : "YUFEI PLAN",                    /* 英文品牌名 */
+  title  : "AAA 冲刺计划",                   /* 当前这份计划的名称 */
+  slogan : "以计划为翼，以坚持为路。",        /* 品牌主宣传语 */
+  examM  : "2026-11-14",                    /* 数学竞赛初赛 */
+  examE  : "2026-12-12"                     /* CET6 */
+};
+
 /* ═══════════ 数据 ═══════════ */
 var TMPL={
  "一":{
@@ -549,7 +562,7 @@ var TL=[
    {d:"2027-04-01",t:"若入围 → 决赛（大连理工 · 高数+线代）",w:9,extra:true,lab:"2027.4"}]}
 ];
 var WD=["周一","周二","周三","周四","周五","周六","周日"];
-var EXAM_M="2026-11-14",EXAM_E="2026-12-12";
+var EXAM_M=PLAN.examM,EXAM_E=PLAN.examE;
 /* 每日问候 + 励志话语（按日期轮换，全部正能量） */
 var NICK="魏于飞";
 var QUOTES=[
@@ -605,8 +618,8 @@ function renderGreet(){
     var dstr=n.getFullYear()+"年"+md(n)+" "+WD[wdIdx(n)];
     var vsuf=' <span class="ver">v'+VER+'</span>';
     if(dayN<1)dl.innerHTML=dstr+" · 计划 10.13 启动（还有 "+(-dayN+1)+" 天）"+vsuf;
-    else if(dayN>61)dl.innerHTML=dstr+" · 计划已完成 🎉"+vsuf;
-    else dl.innerHTML=dstr+" · 计划第 "+dayN+" 天（共 61 天）"+vsuf;
+    else if(dayN>TOTAL_DAYS)dl.innerHTML=dstr+" · 计划已完成 🎉"+vsuf;
+    else dl.innerHTML=dstr+" · 计划第 "+dayN+" 天（共 "+TOTAL_DAYS+" 天）"+vsuf;
   }
 }
 
@@ -672,6 +685,9 @@ function idbGet(k){return idb().then(function(db){return new Promise(function(re
 function idbSet(k,v){return idb().then(function(db){return new Promise(function(res){
   var t=db.transaction("kv","readwrite").objectStore("kv").put(v,k);
   t.onsuccess=function(){res(1);};t.onerror=function(){res(0);};});});}
+/* ⚠️ 这个文件名是历史遗留，不要跟着品牌改名改它：
+   用户已绑定的存档文件夹里就叫这个名字，改名会导致读不到旧存档（数据不丢，但页面会空）。
+   将来若必须改，要先写迁移逻辑：检测旧文件名 → 读取 → 写入新名 → 删除旧文件。 */
 var SAVE_FILE="AAA打卡存档.json";
 function pickFolder(){
   if(!window.showDirectoryPicker)return;
@@ -920,10 +936,15 @@ function updCounts(){
 loadLocal();
 var T=today(),TISO=iso(T),CW=findWeek(TISO);
 var PLAN_START=iso(addD(D(WEEKS[0].mon),WEEKS[0].from));
-var viewId=CW?CW.id:(TISO<PLAN_START?1:9);
+/* 周数与总天数一律「从数据派生」，不写死字面量。
+   以后用户自定义周数时，只需生成不同长度的 WEEKS 数据，这里自动适配。 */
+var TOTAL_WEEKS=WEEKS.length;
+var PLAN_END=iso(addD(D(WEEKS[TOTAL_WEEKS-1].mon),WEEKS[TOTAL_WEEKS-1].to));
+var TOTAL_DAYS=Math.round((D(PLAN_END)-D(PLAN_START))/86400000)+1;
+var viewId=CW?CW.id:(TISO<PLAN_START?1:TOTAL_WEEKS);
 var selDay=TISO;var progLabel="今日进度 ";
 /* 当前版本号 —— 每次发布新版本改这里，并同步在 CHANGELOG.md 记录 */
-var VER="1.1.0";
+var VER="1.2.0";
 
 /* ═══════════ 时间线（色块分区） ═══════════ */
 function renderTimeline(){
@@ -1120,6 +1141,7 @@ function renderExtra(){
   });
   o+='</table>';
   $("overviewBox").innerHTML=o;
+  var ovs=$("ovSum");if(ovs)ovs.textContent="① "+TOTAL_WEEKS+" 周总览表";
   $("methodBox").innerHTML=
    '<div class="mgrid">'+
    '<div class="mcard"><h5><span class="tE">单词</span>墨墨主力 + 不背辅助</h5>'+
@@ -1206,13 +1228,13 @@ function autoOpenDetails(){
 /* ═══════════ 打印版 ═══════════ */
 function buildPrint(){
   var r=$("printRoot");if(r.dataset.built==="1")return;r.dataset.built="1";
-  var h='<h1>AAA 冲刺计划（完整版）</h1><p class="meta">数学竞赛省一 × CET6 450+ ｜ 2026.10.13 – 12.12 ｜ 每日 ≤120 分钟 ｜ 生成于 '+TISO+'</p>';
+  var h='<h1>'+PLAN.brand+' · '+PLAN.title+'（完整版）</h1><p class="meta">数学竞赛省一 × CET6 450+ ｜ 2026.10.13 – 12.12 ｜ 每日 ≤120 分钟 ｜ 生成于 '+TISO+'</p>';
   h+='<h2>关键节点</h2><ul class="meta">'+
    '<li>10.13 启动 → 10.15 诊断完成 → 10.16–11.8 专题突破（每周六中档限时）</li>'+
    '<li>11.8 全真模拟#1（模考例外日）｜ 11.11 全真模拟#2 ｜ <b>11.14 竞赛初赛 9:00–11:30</b></li>'+
    '<li>11.15 过渡休整 ｜ 11.16–12.11 六级总攻（11.21/28、12.5 拆分模考×3）｜ 12.1 打印准考证</li>'+
    '<li>12.7–11 保温周（不刷新题）｜ <b>12.12 CET6 15:00–17:25</b> ｜ 分支：若入围 → 2027.4 决赛（大连理工，高数+线代）</li></ul>';
-  h+='<h2>九周详表</h2>';
+  h+='<h2>'+TOTAL_WEEKS+' 周详表</h2>';
   WEEKS.forEach(function(w){
     var end=addD(D(w.mon),6);
     h+='<h3>W'+w.id+' · '+w.title+'（'+md(D(w.mon))+'–'+md(end)+'）</h3>';

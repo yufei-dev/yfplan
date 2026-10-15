@@ -1,10 +1,12 @@
-# yfxx · 于飞学习计划网站
+# 于飞计划 · YUFEI PLAN
 
 > 个人示例：数学竞赛 × CET6 九周备考计划 · 交互式单页应用
+>
+> **以计划为翼，以坚持为路。**
 
-**当前版本：v1.1.0**
+**当前版本：v1.2.0**
 
-🌐 线上地址：<https://yufei-dev.github.io/yfxx/>
+🌐 线上地址：<https://yufei-dev.github.io/yfplan/>
 
 ---
 
@@ -54,6 +56,7 @@
 | 文档 | 内容 |
 |---|---|
 | [`CHANGELOG.md`](CHANGELOG.md) | 每个版本改了什么 |
+| [`docs/BRAND.md`](docs/BRAND.md) | **品牌规范**（名称、标语、视觉）——后续版本必须遵循 |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | 长期架构、**免费云服务选型对比**、数据模型、权限设计 |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | 分阶段路线图与验收标准 |
 
