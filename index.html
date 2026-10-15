@@ -23,6 +23,9 @@ aside{overflow-y:auto;overflow-x:hidden;height:100%;scrollbar-width:thin;scrollb
 main{overflow-y:auto;height:100%;scrollbar-width:thin;scrollbar-color:#c7d2e4 transparent;padding-right:6px;zoom:1.125}
 main .hd{position:sticky;top:0;z-index:6;background:#f4f7fb;padding:4px 2px 0;margin:0;border-radius:0 0 8px 8px}
 .dateline{font-size:12px;color:#94a3b8;margin-top:1px}
+.dateline .ver{display:inline-block;background:var(--blue-l);color:var(--blue);border:1px solid var(--blue-b);
+  border-radius:9px;font-size:10px;padding:0 7px;font-weight:700;font-variant-numeric:tabular-nums;
+  vertical-align:1px;letter-spacing:.2px}
 .hd+.bigcard{margin-top:4px}
 .bigcard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0 0}
 .bigcard>.sechead{margin:0;border-radius:0;box-shadow:none}
@@ -196,6 +199,10 @@ label.chk:has(input:checked){color:#94a3b8;text-decoration:line-through}
 .wk2 th.sel .badge.sb{display:inline-block;background:#8fa9dd;color:#fff;border-radius:8px;
   font-size:10px;padding:0 6px;margin-left:4px;font-weight:700}
 .wk2 td.sel{background:#e4eeff}
+/* 高亮列内部横线：默认 var(--line)=#e2e8f0 在蓝底上对比度≈0，故按同色系加深
+   仅改 body 单元格的下边框（行分隔线）；不动 #frameToday/#frameSel 列框、不动徽章 */
+.wk2 td.today{border-bottom-color:#7fa8e3}
+.wk2 td.sel{border-bottom-color:#9dbceb}
 .wk2{table-layout:fixed}
 .wk2 .tm{font-size:11.4px;font-weight:700;background:#f1f5f9;white-space:nowrap;width:70px;color:#334155}
 .wk2 .tm small{display:block;font-weight:400;color:var(--mut);font-size:10.2px}
@@ -596,9 +603,10 @@ function renderGreet(){
   if(dl){
     var n=today(),dayN=Math.floor((n-D(PLAN_START))/86400000)+1;
     var dstr=n.getFullYear()+"年"+md(n)+" "+WD[wdIdx(n)];
-    if(dayN<1)dl.textContent=dstr+" · 计划 10.13 启动（还有 "+(-dayN+1)+" 天）";
-    else if(dayN>61)dl.textContent=dstr+" · 计划已完成 🎉";
-    else dl.textContent=dstr+" · 计划第 "+dayN+" 天（共 61 天）";
+    var vsuf=' <span class="ver">v'+VER+'</span>';
+    if(dayN<1)dl.innerHTML=dstr+" · 计划 10.13 启动（还有 "+(-dayN+1)+" 天）"+vsuf;
+    else if(dayN>61)dl.innerHTML=dstr+" · 计划已完成 🎉"+vsuf;
+    else dl.innerHTML=dstr+" · 计划第 "+dayN+" 天（共 61 天）"+vsuf;
   }
 }
 
@@ -914,6 +922,8 @@ var T=today(),TISO=iso(T),CW=findWeek(TISO);
 var PLAN_START=iso(addD(D(WEEKS[0].mon),WEEKS[0].from));
 var viewId=CW?CW.id:(TISO<PLAN_START?1:9);
 var selDay=TISO;var progLabel="今日进度 ";
+/* 当前版本号 —— 每次发布新版本改这里，并同步在 CHANGELOG.md 记录 */
+var VER="1.1.0";
 
 /* ═══════════ 时间线（色块分区） ═══════════ */
 function renderTimeline(){
