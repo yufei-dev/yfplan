@@ -4,9 +4,12 @@
 >
 > **以计划为翼，以坚持为路。**
 
-**当前版本：v1.2.0**
+**当前版本：v1.2.1**
 
-🌐 线上地址：<https://yufei-dev.github.io/yfplan/>
+🌐 线上地址：<https://yfplan.weiyf.ccwu.cc/>
+
+> `https://yufei-dev.github.io/yfplan/` 会自动跳转到上面的自定义域名。
+> 绑定自定义域名后，**网址永久稳定**——以后仓库再改名，书签也不会失效。
 
 ---
 
