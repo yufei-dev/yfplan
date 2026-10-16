@@ -4,7 +4,7 @@
 >
 > **以计划为翼，以坚持为路。**
 
-**当前版本：v1.2.1**
+**当前版本：v1.3.1**
 
 🌐 线上地址：<https://yfplan.weiyf.ccwu.cc/>
 
@@ -47,10 +47,14 @@
 
 ### 发布新版本的流程
 
+> 自 **v1.2.2** 起已接入**自动发布链路**（本地修改 → 自动推送 → Pages 自动更新），
+> 日常发布无需手动操作；以下保留手动流程作为备选。
+
 1. 改代码，把 `index.html` 里的 `var VER` 改成新版本号
 2. 在 `CHANGELOG.md` 顶部加一条新版本记录
 3. 提交（commit message 写清楚改了什么）
-4. GitHub → **Releases** → **Draft a new release** → 填 tag（如 `v1.2.0`）→ 发布
+4. 打 tag 并推送（`git tag vX.Y.Z && git push origin main vX.Y.Z`），
+   或到 GitHub → **Releases** → **Draft a new release**（如填 `v1.3.0`）手动创建
 
 ---
 
